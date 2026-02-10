@@ -1,3 +1,18 @@
-.DS_Store
-__pycache__/
 .env
+
+# Python virtual environments
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw and sensitive data
+data/raw/
+data/private/
+
+# OS
+.DS_Store
