@@ -103,7 +103,7 @@ Any future modeling will be used cautiously and descriptively, with a focus on p
 
 ## About the Author
 
-This project was developed by an educator transitioning into data science and machine learning, with experience in one-to-one and small group academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
+This project was developed by an educator transitioning into data science and machine learning, with experience in one-to-one and small-group academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
 
 Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the training community that helped her see problem-solving, adaptation, and resilience in a more embodied way. The author is grateful to her coaches, teammates, and students for being part of the learning environments that made this project possible. 
 
