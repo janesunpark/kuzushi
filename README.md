@@ -8,7 +8,7 @@ The name comes from the concept of *kuzushi* in Jiu Jitsu, where it refers to di
 
 Kuzushi is an exploratory, longitudinal case study of learning behaviors in early math, spatial reasoning, motivation, co-regulation, and problem-solving. The project focuses on observing stable, recognizable patterns in how learners respond to challenge, select strategies, recover from frustration, and adapt across tasks over time.
 
-The primary data source consists of observations from one-to-one and small-group academic enrichment sessions. Observations from embodied movement contexts, such as Jiu Jitsu classes, remain a secondary exploratory thread and are used cautiously to identify possible cross-context patterns rather than to make claims of transfer. 
+The primary data source consists of observations from small-group academic enrichment sessions. Observations from embodied movement contexts, such as Jiu Jitsu classes, remain a secondary exploratory thread and are used cautiously to identify possible cross-context patterns rather than to make claims of transfer. 
 
 ## Research Motivation
 
@@ -20,7 +20,7 @@ The project's motivation is to document these learning behaviors carefully over 
 
 ## Project Context
 
-Kuzushi is based on a longitudinal case study of young learners observed in one-to-one and small-group academic enrichment settings during the 2025–2026 school year. Sessions primarily focused on early math, spatial reasoning, strategic games, problem-solving tasks, and co-regulated learning interactions. 
+Kuzushi is based on a longitudinal case study of young learners observed in small-group academic enrichment settings during the 2025–2026 school year. Sessions primarily focused on early math, spatial reasoning, strategic games, problem-solving tasks, and co-regulated learning interactions. 
 
 The project follows a small number of learners over time rather than attempting to generalize across a large sample. This allows for detailed observation of learning behaviors such as task persistence, frustration recovery, strategy selection, motivation, comparison dynamics, and responses to scaffolding. 
 
@@ -103,7 +103,7 @@ Any future modeling will be used cautiously and descriptively, with a focus on p
 
 ## About the Author
 
-This project was developed by an educator transitioning into data science and machine learning, with experience in one-to-one academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
+This project was developed by an educator transitioning into data science and machine learning, with experience in one-to-one and small group academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
 
 Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the training community that helped her see problem-solving, adaptation, and resilience in a more embodied way. The author is grateful to her coaches, teammates, and students for being part of the learning environments that made this project possible. 
 
