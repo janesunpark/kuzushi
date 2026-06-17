@@ -69,9 +69,9 @@ These themes are treated as exploratory pattern categories rather than formal fi
 
 ```
 kuzushi/
-├── README.md               # Project overview and public-facing documentation
-├── requirements.txt        # Python dependencies for future analysis scripts and notebooks
-├── docs/                   # Methodology, ethics, observation framework, and roadmap
+├── README.md                # Project overview and public-facing documentation
+├── requirements.txt         # Python dependencies for future analysis scripts and notebooks
+├── docs/                    # Methodology, ethics, observation framework, and roadmap
 ├── research_notes/          # Public-facing school-year summaries and weekly research notes
 ├── data_schema/             # Planned derived data schema, codebook, and sample anonymized structures
 ├── notebooks/               # Future exploratory analysis notebooks
