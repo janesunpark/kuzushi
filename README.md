@@ -42,7 +42,7 @@ The project is currently in an observational and documentation phase. Future ite
 
 Data is collected from structured observation logs during enrichment sessions, including task persistence, error recovery, strategy shifts, co-regulation, and engagement patterns. All observations are collected with parental consent and handled with strict attention to privacy and ethical research practices.
 
-No identifying information is included in this repository. Raw session logs, names, exact dates, locations, videos, photos, and sensitive child-specific details remain private. Public-facing materials are anonymized and written at the level of broader learning patterns rather than identifiable individual records.
+No identifying information is included in this repository. Raw session logs, names, exact dates, locations, videos, photos, and sensitive personal details remain private. Public-facing materials are anonymized and written at the level of broader learning patterns rather than identifiable individual records.
 
 Learners are referenced only through anonymized labels, and any published examples are edited to reduce identifiability while preserving the relevant learning behavior. This repository is intended to document exploratory observational patterns, not to evaluate, diagnose, or rank individual learners. 
 
@@ -50,7 +50,7 @@ Learners are referenced only through anonymized labels, and any published exampl
 
 This repository is in an early public documentation phase. It currently contains project framing, methodology notes, and initial documentation for how private observation logs will be distilled into anonymized public research notes.
 
-The 2025–2026 school year observation cycle has been completed privately. The next phase of the project will focus on organizing public-facing summaries, developing a derived data schema, and gradually adding exploratory scripts or notebooks for trend analysis. 
+The 2025–2026 academic year observation cycle has been completed privately. The next phase of the project will focus on organizing public-facing summaries, developing a derived data schema, and gradually adding exploratory scripts or notebooks for trend analysis. 
 
 ## Emerging Themes
 
@@ -82,7 +82,7 @@ kuzushi/
 
 The next phase of Kuzushi will focus on translating private observation materials into public-facing, anonymized research artifacts. Planned next steps include:
 
-* developing a 2025–2026 school-year summary
+* developing a 2025–2026 year-end summary
 * publishing selected Weekly Research Notes
 * refining the observation framework and derived data schema
 * creating a codebook for future structured analysis
@@ -105,7 +105,7 @@ Any future modeling will be used cautiously and descriptively, with a focus on p
 
 This project was developed by an educator transitioning into data science and machine learning, with experience in one-to-one academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
 
-Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the training community that helped her see problem-solving, adaptation, and resilience in a more embodied way. The author is grateful to her coaches, teammates, and students for being part of the training and learning environments that made this project possible. 
+Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the training community that helped her see problem-solving, adaptation, and resilience in a more embodied way. The author is grateful to her coaches, teammates, and students for being part of the learning environments that made this project possible. 
 
 ## License & Use
 
