@@ -44,12 +44,14 @@ Both learners showed recurring patterns of emotional regulation through trusted-
 
 ### Individual Learning and Problem-Solving Patterns
 
-The learners showed distinct approaches to challenge. One learner often responded well to structure, visual organization, aesthetic interest, and shared attention, while the other often showed strong engagement through novelty, variety, negotiation, creativity, strategic games. These differences became especially visible during worksheet tasks, spatial puzzles, competitive games, and moments of frustration or uncertainty.
+The learners showed distinct approaches to challenge. One learner often responded well to structure, visual organization, aesthetic interest, and shared attention, while the other often showed strong engagement through novelty, variety, negotiation, creativity, and strategic games. These differences became especially visible during worksheet tasks, spatial puzzles, competitive games, and moments of frustration or uncertainty.
 
 ### Spatial Reasoning and Pattern Recognition
 
-Spatial puzzles became a useful context for observing pattern recognition, spatial reasoning, shape manipulation, geometric discrimination, and cognitive flexibility. Across the year, learners showed emerging strategies such as placing familiar shapes first, fitting pieces compactly, identifying visual patterns, and adjusting shape placement as constraints changed. These tasks provided repeated opportunities to observe how learners selected strategies, responded to difficulty, and generalized approaches across puzzle types.
+Spatial puzzles became a useful context for observing pattern recognition, shape manipulation, geometric discrimination, spatial reasoning, and cognitive flexibility. Across the year, learners showed emerging strategies such as placing familiar shapes first, fitting pieces compactly, identifying visual patterns, and adjusting shape placement as constraints changed. These tasks provided repeated opportunities to observe how learners selected strategies, responded to difficulty, and generalized approaches across puzzle types.
 
 ### Possible Cross-Context Problem-Solving Patterns
 
 Periodic observations from youth Jiu Jitsu classes provided a secondary exploratory thread. Early observations suggested possible overlap in how learners approached challenge across academic, game-based, spatial, and embodied contexts. For example, familiar-position or familiar-shape preferences appeared in more than one learning environment. These observations are treated cautiously as possible cross-context signals, not as evidence of transfer or causation. Future observations may examine whether familiarity-based approaches support confidence and initial problem-solving, while also tracking whether repeated reliance on familiar strategies becomes limiting when learners need to adapt to changing constraints.
+
+
