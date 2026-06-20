@@ -22,7 +22,7 @@ Embodied movement observations, including youth Jiu Jitsu contexts, are treated 
 
 Observations collected during the 2025–2026 cycle consisted of small-group academic enrichment sessions involving early math, spatial puzzles, strategic games, play-based exploration, and co-regulated learning. Class structure in the fall semester included more self-directed exploration and free play, while the spring semester became more structured, with increased worksheet tasks, spatial puzzles, and reward-cycle routines.
 
-The learners were young children from English language learner (ELL) backgrounds and were new to a structured learning environment. In both private and public-facing materials, they referred to only through anonymized labels. The learners also regularly participated in youth Jiu Jitsu classes. Observations made in these embodied learning contexts were periodic and secondary, used only when relevant to problem-solving, strategy selection, regulation, or adaptation under constraint. 
+The learners were young children from English language learner (ELL) backgrounds and were new to a structured learning environment. In both private and public-facing materials, they are referred to only through anonymized labels. The learners also regularly participated in youth Jiu Jitsu classes. Observations made in these embodied learning contexts were periodic and secondary, used only when relevant to problem-solving, strategy selection, regulation, or adaptation under constraint. 
 
 Exact dates, locations, schedules, and identifying details are intentionally omitted to protect the learners' privacy and follow ethical research practices. 
 
