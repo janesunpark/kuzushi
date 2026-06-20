@@ -26,4 +26,30 @@ The learners were young children from English language learner (ELL) backgrounds
 
 Exact dates, locations, schedules, and identifying details are intentionally omitted to protect the learners' privacy and follow ethical research practices. 
 
+## Major Emerging Themes
 
+The following themes emerged across the 2025–2026 observation cycle. They are treated as exploratory pattern categories rather than formal findings. 
+
+### Cognitive Stamina and Task Persistence
+
+Both learners showed increased ability to remain engaged with structured tasks over time. In the fall semester, sessions emphasized emotional safety, play-based exploration, and positive association with learning. By the spring semester, both learners were able to complete more worksheet pages, remain engaged with longer task sequences, and tolerate more challenging academic or spatial tasks. This growth appeared to be related to a combination of increased familiarity with the learning environment, routine, scaffolding, reward systems, and growing confidence.
+
+### Motivation, Reward Systems, and Visible Progress
+
+Motivation appeared to be shaped by multiple factors, including task novelty, reward value, visible progress markers, social recognition, and pride in completed work. A multi-layered reward system introduced in the spring semester appeared to support sustained effort and helped make progress visible. Learner responses to rewards varied, suggesting that rewards functioned less as simple incentives and more as part of a broader routine involving anticipation, choice, completion, and recognition. 
+
+### Co-Regulation and Emotional Recovery
+
+Both learners showed recurring patterns of emotional regulation through trusted-adult support. Teacher reassurance, calm proximity, reframing, and acknowledgment appeared to help learners recover from frustration, disappointment, sibling comparison, or uncertainty. Over time, both learners showed increased ability to return to tasks after moments of dysregulation, suggesting that co-regulation played an important role in sustaining engagement.
+
+### Individual Learning and Problem-Solving Patterns
+
+The learners showed distinct approaches to challenge. One learner often responded well to structure, visual organization, aesthetic interest, and shared attention, while the other often showed strong engagement through novelty, variety, negotiation, creativity, strategic games. These differences became especially visible during worksheet tasks, spatial puzzles, competitive games, and moments of frustration or uncertainty.
+
+### Spatial Reasoning and Pattern Recognition
+
+Spatial puzzles became a useful context for observing pattern recognition, spatial reasoning, shape manipulation, geometric discrimination, and cognitive flexibility. Across the year, learners showed emerging strategies such as placing familiar shapes first, fitting pieces compactly, identifying visual patterns, and adjusting shape placement as constraints changed. These tasks provided repeated opportunities to observe how learners selected strategies, responded to difficulty, and generalized approaches across puzzle types.
+
+### Possible Cross-Context Problem-Solving Patterns
+
+Periodic observations from youth Jiu Jitsu classes provided a secondary exploratory thread. Early observations suggested possible overlap in how learners approached challenge across academic, game-based, spatial, and embodied contexts. For example, familiar-position or familiar-shape preferences appeared in more than one learning environment. These observations are treated cautiously as possible cross-context signals, not as evidence of transfer or causation. Future observations may examine whether familiarity-based approaches support confidence and initial problem-solving, while also tracking whether repeated reliance on familiar strategies becomes limiting when learners need to adapt to changing constraints.
