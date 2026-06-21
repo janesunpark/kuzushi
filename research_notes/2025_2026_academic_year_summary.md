@@ -56,7 +56,7 @@ Periodic observations from youth Jiu Jitsu classes provided a secondary explorat
 
 ## S01 Summary Patterns
 
-Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and task routines. She also showed increasing confidence in numeral writing and pattern-based activities. 
+Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and task routines. She also showed increasing confidence in numeral writing and pattern-based activities. Most notably, she appeared to shift from comparing her progress to her older sibling's work toward taking greater ownership of tasks appropriate to her own level. Over time, she showed increased pride in carrying tasks to completion and in recognizing progress toward her own learning goals. 
 
 The clearest areas of growth appeared to be working memory, numeracy, geometric pattern recognition, and transfer of problem-solving approaches across spatial puzzles. Different entry strategies and problem-solving patterns were observed depending on puzzle difficulty. For more challenging puzzles with greater constraints, S01 often approached the task by completing familiar patterns first. With less constrained puzzles, her preference for visual organization and aesthetics appeared to support a more sequential problem-solving approach, often resulting in spatial efficiency. 
 
