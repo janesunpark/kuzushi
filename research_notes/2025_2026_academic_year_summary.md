@@ -56,11 +56,25 @@ Periodic observations from youth Jiu Jitsu classes provided a secondary explorat
 
 ## S01 Summary Patterns
 
-Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and task routines. The learner also showed increasing confidence in numeral writing and pattern-based activities. 
+Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and task routines. She also showed increasing confidence in numeral writing and pattern-based activities. 
 
-The clearest areas of growth appeared to be working memory, numeracy, geometric pattern recognition, and transfer of problem-solving approaches across spatial puzzles. Different entry strategies and problem-solving patterns were observed depending on puzzle difficulty. For more challenging puzzles with greater constraints, S01 often approached the task by completing familiar patterns first. With less constrained puzzles, her preference for visual organization and aesthetics appeared to influence her problem-solving approach. 
+The clearest areas of growth appeared to be working memory, numeracy, geometric pattern recognition, and transfer of problem-solving approaches across spatial puzzles. Different entry strategies and problem-solving patterns were observed depending on puzzle difficulty. For more challenging puzzles with greater constraints, S01 often approached the task by completing familiar patterns first. With less constrained puzzles, her preference for visual organization and aesthetics appeared to support a more sequential problem-solving approach, often resulting in spatial efficiency. 
 
-Overall, S01 responded well to structured activity, visual organization, aesthetic interest, shared attention, and task completion. Across the year, she transitioned from needing more emotional safety and co-regulation toward increased cognitive stamina, readiness for more advanced structured material, and growing expressions of autonomy and confidence. 
+Overall, S01 responded positively to structured activity, visual organization, aesthetic interest, shared attention, and task completion. Across the year, she transitioned from needing more emotional safety and co-regulation toward increased cognitive stamina, readiness for more advanced structured material, and growing expressions of autonomy and confidence. Her co-regulation patterns often appeared through proximity, shared attention, and reassurance, especially during moments of uncertainty, comparison, or transition. 
+
+## S02 Summary Patterns
+
+Learner S02 showed steady growth across the year, particularly in task stamina, worksheet completion, strategic play, and expressions of autonomy in task structure and game design. He showed a strong preference for novelty, variety, reward value, competitive games, and opportunities to make choices within the session through negotiation. Across the year, he appeared to transition from needing greater teacher support when facing unfamiliar tasks toward developing more self-directed regulation patterns, which supported increased stamina, worksheet completion, and openness toward challenging tasks.
+
+S02 showed a relatively consistent problem-solving process across task types. He demonstrated visible improvement in pattern recognition, geometric discrimination, shape manipulation, and part-whole reasoning. For unfamiliar or challenging spatial puzzles, he often approached the task by completing familiar patterns first. For less constrained puzzles with familiar structures, he used a curiosity-driven, trial-and-error approach that was not always efficient or linear, but allowed for self-directed exploration and consolidation of previously learned concepts. His preference for familiar shapes or methods was observed across challenging spatial and worksheet tasks. A similar preference for familiar techniques and positions was also observed during youth Jiu Jitsu sparring, suggesting a possible cross-context signal across academic, spatial, and embodied learning contexts.
+
+S02 also developed a recognizable self-regulation cycle across the year. He often began sessions by completing worksheet tasks within the day's reward system, which appeared to become a regulatory routine rather than a simple incentive. He then frequently sought one-to-one competitive play with the teacher as a way to pace the session, regulate attention, and re-engage through strategic interaction. Toward the end of sessions, he often shifted into a spatial puzzle, a different game, or additional worksheet tasks depending on motivation, task demand, and available supports. This pattern of engagement–break–engagement appeared across both playful and more demanding contexts, suggesting a learner-specific preference for exercising autonomy and creativity while regulating attention and effort. 
+
+
+
+
+
+
 
 
 
