@@ -50,8 +50,19 @@ The learners showed distinct approaches to challenge. One learner often responde
 
 Spatial puzzles became a useful context for observing pattern recognition, shape manipulation, geometric discrimination, spatial reasoning, and cognitive flexibility. Across the year, learners showed emerging strategies such as placing familiar shapes first, fitting pieces compactly, identifying visual patterns, and adjusting shape placement as constraints changed. These tasks provided repeated opportunities to observe how learners selected strategies, responded to difficulty, and generalized approaches across puzzle types.
 
-### Possible Cross-Context Problem-Solving Patterns
+### Possible Cross-Context Problem-Solving Approaches
 
 Periodic observations from youth Jiu Jitsu classes provided a secondary exploratory thread. Early observations suggested possible overlap in how learners approached challenge across academic, game-based, spatial, and embodied contexts. For example, familiar-position or familiar-shape preferences appeared in more than one learning environment. These observations are treated cautiously as possible cross-context signals, not as evidence of transfer or causation. Future observations may examine whether familiarity-based approaches support confidence and initial problem-solving, while also tracking whether repeated reliance on familiar strategies becomes limiting when learners need to adapt to changing constraints.
+
+## S01 Summary Patterns
+
+Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and task routines. The learner also showed increasing confidence in numeral writing and pattern-based activities. 
+
+The clearest areas of growth appeared to be working memory, numeracy, geometric pattern recognition, and transfer of problem-solving approaches across spatial puzzles. Different entry strategies and problem-solving patterns were observed depending on puzzle difficulty. For more challenging puzzles with greater constraints, S01 often approached the task by completing familiar patterns first. With less constrained puzzles, her preference for visual organization and aesthetics appeared to influence her problem-solving approach. 
+
+Overall, S01 responded well to structured activity, visual organization, aesthetic interest, shared attention, and task completion. Across the year, she transitioned from needing more emotional safety and co-regulation toward increased cognitive stamina, readiness for more advanced structured material, and growing expressions of autonomy and confidence. 
+
+
+
 
 
