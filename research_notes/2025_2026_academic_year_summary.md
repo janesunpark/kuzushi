@@ -42,7 +42,7 @@ Motivation appeared to be shaped by multiple factors, including task novelty, re
 
 Both learners showed recurring patterns of emotional regulation through trusted-adult support. Teacher reassurance, calm proximity, reframing, and acknowledgment appeared to help learners recover from frustration, disappointment, sibling comparison, or uncertainty. Over time, both learners showed increased ability to return to tasks after moments of dysregulation, suggesting that co-regulation played an important role in sustaining engagement.
 
-### Individual Learning and Problem-Solving Patterns
+### Individual Learning and Problem-Solving Styles
 
 The learners showed distinct approaches to challenge. One learner often responded well to structure, visual organization, aesthetic interest, and shared attention, while the other often showed strong engagement through novelty, variety, negotiation, creativity, and strategic games. These differences became especially visible during worksheet tasks, spatial puzzles, competitive games, and moments of frustration or uncertainty.
 
@@ -64,7 +64,7 @@ Overall, S01 responded positively to structured activity, visual organization, a
 
 ## S02 Summary Patterns
 
-Learner S02 showed steady growth across the year, particularly in task stamina, worksheet completion, strategic play, and expressions of autonomy in task structure and game design. He showed a strong preference for novelty, variety, reward value, competitive games, and opportunities to make choices within the session through negotiation. Across the year, he appeared to transition from needing greater teacher support when facing unfamiliar tasks toward developing more self-directed regulation patterns, which supported increased stamina, worksheet completion, and openness toward challenging tasks.
+Learner S02 showed steady growth across the year, particularly in cognitive stamina, worksheet completion, strategic play, and expressions of autonomy in task structure and game design. He showed a strong preference for novelty, variety, reward value, competitive games, and opportunities to make choices within the session through negotiation. Across the year, he appeared to transition from needing greater teacher support when facing unfamiliar tasks toward developing more self-directed regulation patterns, which supported increased focus, worksheet completion, and openness toward challenging tasks.
 
 S02 showed a relatively consistent problem-solving process across task types. He demonstrated visible improvement in pattern recognition, geometric discrimination, shape manipulation, and part-whole reasoning. For unfamiliar or challenging spatial puzzles, he often approached the task by completing familiar patterns first. For less constrained puzzles with familiar structures, he used a curiosity-driven, trial-and-error approach that was not always efficient or linear, but allowed for self-directed exploration and consolidation of previously learned concepts. His preference for familiar shapes or methods was observed across challenging spatial and worksheet tasks. A similar preference for familiar techniques and positions was also observed during youth Jiu Jitsu sparring, suggesting a possible cross-context signal across academic, spatial, and embodied learning contexts.
 
