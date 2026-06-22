@@ -40,7 +40,7 @@ Motivation appeared to be shaped by multiple factors, including task novelty, re
 
 ### Co-Regulation and Emotional Recovery
 
-Both learners showed recurring patterns of emotional regulation through trusted-adult support. Teacher reassurance, calm proximity, reframing, and acknowledgment appeared to help learners recover from frustration, disappointment, sibling comparison, or uncertainty. Over time, both learners showed increased ability to return to tasks after moments of dysregulation, suggesting that co-regulation played an important role in sustaining engagement.
+Both learners showed recurring patterns of emotional regulation through trusted-adult support. Teacher reassurance, calm proximity, reframing, and acknowledgment appeared to help learners recover from frustration, disappointment, sibling comparison, or uncertainty. Over time, both learners showed increased ability to return to tasks after moments of frustration, suggesting that co-regulation played an important role in sustaining engagement.
 
 ### Individual Learning and Problem-Solving Styles
 
@@ -56,7 +56,7 @@ Periodic observations from youth Jiu Jitsu classes provided a secondary explorat
 
 ## S01 Summary Patterns
 
-Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and task routines. She also showed increasing confidence in numeral writing and pattern-based activities. Most notably, she appeared to shift from comparing her progress to her older sibling's work toward taking greater ownership of tasks appropriate to her own level. Over time, she showed increased pride in carrying tasks to completion and in recognizing progress toward her own learning goals. 
+Learner S01 demonstrated growing cognitive stamina across the year. She gradually increased her ability to complete structured worksheet tasks and appeared to take pride in visible progress markers, including completed books and reward cycle charts. She also showed increasing confidence in numeral writing and pattern-based activities. Most notably, she appeared to shift from comparing her progress to her older sibling's work toward taking greater ownership of tasks appropriate to her own level. Over time, she showed increased pride in carrying tasks to completion and in recognizing progress toward her own learning goals. 
 
 The clearest areas of growth appeared to be working memory, numeracy, geometric pattern recognition, and transfer of problem-solving approaches across spatial puzzles. Different entry strategies and problem-solving patterns were observed depending on puzzle difficulty. For more challenging puzzles with greater constraints, S01 often approached the task by completing familiar patterns first. With less constrained puzzles, her preference for visual organization and aesthetics appeared to support a more sequential problem-solving approach, often resulting in spatial efficiency. 
 
@@ -70,7 +70,13 @@ S02 showed a relatively consistent problem-solving process across task types. He
 
 S02 also developed a recognizable self-regulation cycle across the year. He often began sessions by completing worksheet tasks within the day's reward system, which appeared to become a regulatory routine rather than a simple incentive. He then frequently sought one-to-one competitive play with the teacher as a way to pace the session, regulate attention, and re-engage through strategic interaction. Toward the end of sessions, he often shifted into a spatial puzzle, a different game, or additional worksheet tasks depending on motivation, task demand, and available supports. This pattern of engagement–break–engagement appeared across both playful and more demanding contexts, suggesting a learner-specific preference for exercising autonomy and creativity while regulating attention and effort. 
 
+## Cross-Learner Patterns
 
+Across the year, both S01 and S02 showed visible growth in stamina, task persistence, and recovery after challenging moments. They also began to demonstrate more practical mathematical application during sessions, including functional arithmetic through play, numeral reading, and quantity counting, suggesting movement from concrete application toward early conceptual abstraction. Toward the end of the academic year, both learners showed smoother transitions into more advanced structured materials. 
+
+In the spring semester, session activities, particularly worksheet tasks, appeared to become familiar routines that supported both co-regulation and self-directed regulation. As their ability to stay engaged with tasks increased, learner-specific regulation cycles also became more defined. During moments of frustration, uncertainty, or disengagement, S01 sought support through proximity and responded best to calm, quiet presence while returning to tasks on her own terms. In contrast, S02 often sought brief privacy or separation before returning to tasks through self-directed regulation. For both learners, calm continuation of the session appeared to support re-engagement without escalating the moment.
+
+Across the year, both learners developed learner-specific problem-solving strategies with some shared characteristics. Notably, both S01 and S02 completed familiar patterns first in challenging spatial puzzles with greater or less familiar structures. Interestingly, neither learner appeared primarily focused on efficiency when the task was framed as playful exploration. Both learners appeared to take time observing patterns, manipulating shapes, and applying previously learned concepts independently, including part-whole reasoning. Future observations may examine how different levels of challenge, pressure, and teacher support affect problem-solving across academic, spatial, and embodied contexts. 
 
 
 
