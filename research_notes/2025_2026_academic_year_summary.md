@@ -88,7 +88,9 @@ S02 repeatedly preferred familiar techniques, positions, or sequences during liv
 
 This year-end summary for the 2025–2026 observation cycle is based on private observation logs and weekly synthesis notes. Public-facing materials are anonymized and written at the broader level of learning patterns and behaviors while minimizing identifiability to protect privacy. This summary is exploratory and should not be read as a collection of formal findings or causal claims. 
 
+## Limitations
 
+This project has several limitations. Because Kuzushi follows a small number of learners in a naturalistic enrichment setting, observations are not generalizable and may reflect the specific context, relationship dynamics, and instructional routines of the sessions. The observations are also shaped by a single observer's interpretation, and public-facing summaries are necessarily selective because raw logs and sensitive details remain private. Cross-context patterns involving Jiu Jitsu are treated as preliminary signals only, not evidence of transfer or causation. 
 
 
 
