@@ -78,9 +78,17 @@ In the spring semester, session activities, particularly worksheet tasks, appear
 
 Across the year, both learners developed learner-specific problem-solving strategies with some shared characteristics. Notably, both S01 and S02 completed familiar patterns first in challenging spatial puzzles with less familiar or greater structures. Interestingly, neither learner appeared primarily focused on efficiency when the task was framed as playful exploration. Both learners appeared to take time observing patterns, manipulating shapes, and applying previously learned concepts independently, including part-whole reasoning. Future observations may examine how different levels of challenge, pressure, and teacher support affect problem-solving across academic, spatial, and embodied contexts. 
 
+## Embodied Observation Thread
+
+Periodic embodied observations in youth Jiu Jitsu contexts served as a secondary exploratory thread and were used cautiously to note possible cross-context patterns in problem-solving under constraint. Academic enrichment sessions provided opportunities to observe strategy selection, regulation, and task persistence through math, spatial puzzles, and structured play. Youth Jiu Jitsu classes provided a different context for observing similar behaviors under physical, cognitive, and social constraints. 
+
+S02 repeatedly preferred familiar techniques, positions, or sequences during live and positional sparring. This pattern appeared across situations with varying levels of challenge and may relate to his broader preference for familiar entry points in spatial puzzles and structured academic tasks. Improvement in cognitive stamina and task persistence also appeared across multiple learning environments, though these observations remain preliminary and are not treated as evidence of transfer. 
+
 ## Methodological Note
 
-This year-end summary for the 2025–2026 observation cycle is based on private observation logs and weekly synthesis notes. Public-facing notes are anonymized and written at the broader level of learning patterns and behaviors while minimizing identifiability to protect privacy. This summary is exploratory and should not be read as a collection of formal findings or causal claims. 
+This year-end summary for the 2025–2026 observation cycle is based on private observation logs and weekly synthesis notes. Public-facing materials are anonymized and written at the broader level of learning patterns and behaviors while minimizing identifiability to protect privacy. This summary is exploratory and should not be read as a collection of formal findings or causal claims. 
+
+
 
 
 
