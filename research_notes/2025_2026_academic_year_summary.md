@@ -92,6 +92,26 @@ This year-end summary for the 2025–2026 observation cycle is based on private 
 
 This project has several limitations. Because Kuzushi follows a small number of learners in a naturalistic enrichment setting, observations are not generalizable and may reflect the specific context, relationship dynamics, and instructional routines of the sessions. The observations are also shaped by a single observer's interpretation, and public-facing summaries are necessarily selective because raw logs and sensitive details remain private. Cross-context patterns involving Jiu Jitsu are treated as preliminary signals only, not evidence of transfer or causation. 
 
+## Next Research Questions
+
+A number of exploratory research questions were distilled from this observation cycle. Most notably:
+
+* How do structured routines and visible progress markers affect cognitive stamina and task persistence over time?
+
+* How do learner-specific regulation cycles develop in small-group enrichment settings?
+
+* When do familiar entry points support confidence, and when do they limit cognitive flexibility?
+
+* How do learners respond when familiar strategies no longer work under new constraints?
+
+* Do learner-specific problem-solving patterns appear across academic, game-based, spatial, and embodied contexts?
+
+* How do spatial puzzles and structured play support early mathematical reasoning, including pattern recognition, part-whole thinking, and movement from concrete application toward early abstraction? 
+
+* How do different levels of challenge, pressure, and teacher support affect strategy selection and recovery after difficulty? 
+
+
+
 
 
 
