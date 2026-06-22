@@ -80,6 +80,9 @@ Across the year, both learners developed learner-specific problem-solving strate
 
 ## Methodological Note
 
+This year-end summary for the 2025–2026 observation cycle is based on private observation logs and weekly synthesis notes. Public-facing notes are anonymized and written at the broader level of learning patterns and behaviors while minimizing identifiability to protect privacy. This summary is exploratory and should not be read as a collection of formal findings or causal claims. 
+
+
 
 
 
