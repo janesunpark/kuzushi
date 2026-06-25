@@ -42,7 +42,7 @@ Motivation appeared to be shaped by multiple factors, including task novelty, re
 
 Both learners showed recurring patterns of emotional regulation through trusted-adult support. Teacher reassurance, calm proximity, reframing, and acknowledgment appeared to help learners recover from frustration, disappointment, sibling comparison, or uncertainty. Over time, both learners showed increased ability to return to tasks after moments of frustration, suggesting that co-regulation played an important role in sustaining engagement.
 
-### Individual Learning and Problem-Solving Styles
+### Individual Learning and Problem-Solving Pathways
 
 The learners showed distinct approaches to challenge. One learner often responded well to structure, visual organization, aesthetic interest, and shared attention, while the other often showed strong engagement through novelty, variety, negotiation, creativity, and strategic games. These differences became especially visible during worksheet tasks, spatial puzzles, competitive games, and moments of frustration or uncertainty.
 
