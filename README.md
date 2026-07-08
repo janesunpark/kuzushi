@@ -38,7 +38,7 @@ Detailed information on the methodology of this project can be found in [Methodo
 
 ## Data Ethics & Anonymization
 
-Kuzushi is baed on structured observation logs from academic enrichment sessions, with all observations collected with parental consent and handled with strict attention to privacy and ethical research practices. Public-facing materials are anonymized and written at the level of broader learning patterns rather than identifiable individual records.
+Kuzushi is based on structured observation logs from academic enrichment sessions, with all observations collected with parental consent and handled with strict attention to privacy and ethical research practices. Public-facing materials are anonymized and written at the level of broader learning patterns rather than identifiable individual records.
 
 Raw session logs, names, exact dates, locations, videos, photos, and sensitive personal details remain private. This repository is intended to document exploratory observational patterns, not to evaluate, diagnose, or rank individual learners. 
 
