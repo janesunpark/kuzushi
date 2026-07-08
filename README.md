@@ -70,7 +70,7 @@ kuzushi/
 ├── README.md                # Project overview and public-facing documentation
 ├── requirements.txt         # Python dependencies for future analysis scripts and notebooks
 ├── docs/                    # Methodology, ethics, observation framework, and roadmap
-├── research_notes/          # Public-facing school-year summaries and weekly research notes
+├── research_notes/          # Public-facing school-year summaries and Weekly Research Notes
 ├── data_schema/             # Planned derived data schema, codebook, and sample anonymized structures
 ├── notebooks/               # Future exploratory analysis notebooks
 └── src/                     # Future Python scripts for data structuring and analysis
@@ -78,13 +78,14 @@ kuzushi/
 
 ## Next Steps
 
-The next phase of Kuzushi will focus on translating private observation materials into public-facing, anonymized research artifacts. Planned next steps include:
+The next phase of Kuzushi will focus on strengthening the project's methodological foundation and preparing for future structured analysis. Planned next steps include:
 
-* developing a 2025–2026 year-end summary
-* publishing selected Weekly Research Notes
-* refining the observation framework and derived data schema
-* creating a codebook for future structured analysis
+* completing the observation framework
+* completing the project roadmap
+* refining the derived data schema and future codebook
+* creating a sample anonymized or synthetic data structures 
 * building initial exploratory notebooks to visualize trends over time
+* developing a public-facing Notion or portfolio page to organize project materials
 * continuing to document possible cross-context problem-solving patterns with caution 
 
 ## Planned Technical Stack
