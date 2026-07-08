@@ -30,21 +30,19 @@ Kuzushi is not a product, curriculum, or intervention. It does not claim causal 
 
 ## Methodology
 
-Kuzushi uses a multi-layered observation and synthesis process. Raw session observations are recorded privately after academic enrichment sessions, along with periodic embodied movement observations. These notes document task context, learner response, scaffolding, motivation, emotional regulation, problem-solving behavior, and observable strategy use. 
+Kuzushi uses a multi-layered observation and synthesis process consisting of private observation logs and distilled public-facing summaries. Private observation logs document task context, learner response, scaffolding, motivation, emotional regulation, problem-solving behavior, and observable strategy use. 
 
-Private session observations are then compressed into Weekly Synthesis Logs, which identify notable shifts, recurring patterns, learning mechanisms, and optional data flags for future monitoring. These weekly syntheses help track changes over time while preserving the distinction between individual session detail and broader developmental patterns. 
+Raw notes, identifying details, and sensitive observations are not published. Public-facing research notes are intended to preserve the project's longitudinal reasoning process and support future exploratory analysis.    
 
-Public-facing Weekly Research Notes are further distilled from the private synthesis logs. These notes are anonymized and written at the pattern level rather than as individual records. Raw notes, identifying details, and sensitive observations are not published. 
-
-The project is currently in an observational and documentation phase. Future iterations may use Python-based data pipelines to structure derived observational data, create exploratory visualizations, and examine trends over time. Any future machine learning work will focus on exploratory pattern recognition rather than prediction or evaluation of individual learners. 
+Detailed information on the methodology of this project can be found in [Methodology](docs/methodology.md). 
 
 ## Data Ethics & Anonymization
 
-Data is collected from structured observation logs during enrichment sessions, including task persistence, error recovery, strategy shifts, co-regulation, and engagement patterns. All observations are collected with parental consent and handled with strict attention to privacy and ethical research practices.
+Kuzushi is baed on structured observation logs from academic enrichment sessions, with all observations collected with parental consent and handled with strict attention to privacy and ethical research practices. Public-facing materials are anonymized and written at the level of broader learning patterns rather than identifiable individual records.
 
-No identifying information is included in this repository. Raw session logs, names, exact dates, locations, videos, photos, and sensitive personal details remain private. Public-facing materials are anonymized and written at the level of broader learning patterns rather than identifiable individual records.
+Raw session logs, names, exact dates, locations, videos, photos, and sensitive personal details remain private. This repository is intended to document exploratory observational patterns, not to evaluate, diagnose, or rank individual learners. 
 
-Learners are referenced only through anonymized labels, and any published examples are edited to reduce identifiability while preserving the relevant learning behavior. This repository is intended to document exploratory observational patterns, not to evaluate, diagnose, or rank individual learners. 
+Detailed privacy and anonymization practices are described in [Data Ethics & Anonymization](docs/data_ethics.md).
 
 ## Current Status
 
