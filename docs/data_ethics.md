@@ -1,6 +1,6 @@
 # Data Ethics & Anonymization
 
-## Purpose of This Document
+## Purpose
 
 This document explains the privacy and ethics principles used in Kuzushi. Because the project involves observations of young learners in academic enrichment and embodied learning contexts, all public-facing materials are written with strict attention to anonymity, privacy, and responsible interpretation.
 
