@@ -48,7 +48,7 @@ Observed patterns are treated as signals for future observation rather than form
 
 ## Relationship to Data Ethics
 
-Privacy and anonymization are central to the methodology. Raw observation logs and sensitive private data remain private. Learners are referenced only through anonymized labels, and public-facing examples are edited to reduce identifiability while preserving the relevant learning pattern. 
+Privacy and anonymization are central to the methodology. Raw observation logs and sensitive private data remain undisclosed. Learners are referenced only through anonymized labels, and public-facing examples are edited to reduce identifiability while preserving the relevant learning pattern. 
 
 Detailed privacy and anonymization practices are described in [Data Ethics & Anonymization](data_ethics.md).
 
