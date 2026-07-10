@@ -48,7 +48,7 @@ Detailed privacy and anonymization practices are described in [Data Ethics & Ano
 
 This repository is in an early public documentation phase. It currently contains project framing, methodology notes, and initial documentation for how private observation logs will be distilled into anonymized public research notes.
 
-The 2025–2026 academic year observation cycle has been completed privately. The next phase of the project will focus on organizing public-facing summaries, developing a derived data schema, and gradually adding exploratory scripts or notebooks for trend analysis. 
+The 2025–2026 academic year observation cycle has been completed privately. The next phase of the project will focus on refining public-facing summaries, developing a derived data schema, and gradually adding exploratory scripts or notebooks for trend analysis. 
 
 ## Emerging Themes
 
@@ -80,10 +80,8 @@ kuzushi/
 
 The next phase of Kuzushi will focus on strengthening the project's methodological foundation and preparing for future structured analysis. Planned next steps include:
 
-* completing the observation framework
-* completing the project roadmap
-* refining the derived data schema and future codebook
-* creating a sample anonymized or synthetic data structures 
+* developing the derived data schema and future codebook
+* creating sample anonymized or synthetic data structures 
 * building initial exploratory notebooks to visualize trends over time
 * developing a public-facing Notion or portfolio page to organize project materials
 * continuing to document possible cross-context problem-solving patterns with caution 
