@@ -10,17 +10,17 @@ The categories described here are not formal assessment categories. They are use
 
 The current observation framework organizes recurring learning behaviors into several broad domains.
 
-| Domain                                      | What is Observed                                                                                        | Example Signals                                                                       |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Cognitive stamina                           | Ability to sustain task engagement over time                                                            | worksheet output, return after breaks, longer task sequences                          |
-| Strategy adaptation                         | Changes in approach under constraint                                                                    | familiar-pattern-first approaches, rotation, scaffold fading                          |
-| Co-regulation and recovery                  | Emotional recovery after challenge or uncertainty                                                       | openness toward reframing, self-directed regulation, return to task                   |
-| Motivation and visible progress             | Impact of rewards, acknowledgment, novelty, and visible completion                                      | response to reward value, completed books, stickers, progress markers                 |
-| Spatial reasoning and pattern recognition   | Ability to detect, compare, and manipulate visual or numerical structures                               | part-whole spatial structure, geometric sequences, shape rotation                     |
-| Functional arithmetic and early abstraction | Movement from concrete quantities toward symbolic or conceptual reasoning                               | assigning numerical values to object quantities, number bonds, practical arithmetic   |
-| Autonomy and independence                   | Ability to initiate, sustain, or complete tasks with reduced direct support                             | task initiative, confidence, creative construction, independent completion            |
-| Familiarity, constraint, and flexibility    | Ability to use familiar entry points while adjusting to new task demands                                | adjusting puzzle pieces, adapting known strategies, hybrid problem-solving approaches |
-| Cross-context signals                       | Possible recurring problem-solving patterns across academic, game-based, spatial, and embodied contexts | familiarity as an entry point in both academic and embodied contexts                  |
+| Domain | What is Observed | Example Signals |
+| --- | --- | --- |
+| Cognitive stamina | Ability to sustain task engagement over time | worksheet output, return after breaks, longer task sequences |
+| Strategy adaptation | Changes in approach under constraint | familiar-pattern-first approaches, rotation, scaffold fading |
+| Co-regulation and recovery | Emotional recovery after challenge or uncertainty | openness toward reframing, self-directed regulation, return to task |
+| Motivation and visible progress | Impact of rewards, acknowledgment, novelty, and visible completion | response to reward value, completed books, stickers, progress markers |
+| Spatial reasoning and pattern recognition | Ability to detect, compare, and manipulate visual or numerical structures | part-whole spatial structure, geometric sequences, shape rotation |
+| Functional arithmetic and early abstraction | Movement from concrete quantities toward symbolic or conceptual reasoning | assigning numerical values to object quantities, number bonds, practical arithmetic |
+| Autonomy and independence | Ability to initiate, sustain, or complete tasks with reduced direct support | task initiative, confidence, creative construction, independent completion |
+| Familiarity, constraint, and flexibility | Ability to use familiar entry points while adjusting to new task demands | adjusting puzzle pieces, adapting known strategies, hybrid problem-solving approaches |
+| Cross-context signals | Possible recurring problem-solving patterns across academic, game-based, spatial, and embodied contexts | familiarity as an entry point in both academic and embodied contexts |
 
 ## Academic Learning Behaviors
 
