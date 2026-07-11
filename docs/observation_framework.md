@@ -66,13 +66,13 @@ Future observations may examine whether learner-specific regulation patterns app
 
 This domain tracks how motivation appears through task choice, persistence, re-engagement, response to novelty, and willingness to continue after challenge. Rewards are not treated only as incentives. In Kuzushi, reward systems are also observed as part of the learning environment, shaping anticipation, pacing, choice, completion, and recognition.
 
-Motivational signals may include:
+Motivation may be observed through responses to:
 
 * visible progress markers
 * stickers or reward images
 * completed books
 * novelty
-* reward value
+* perceived reward value
 * competitive games
 * acknowledgment from trusted adults
 * learner choice
@@ -87,19 +87,19 @@ This domain tracks how learners approach spatial puzzles and other tasks involvi
 
 Different constraint levels may reveal different forms of problem-solving behavior. Less constrained tasks may reveal exploration, aesthetic preference, visual organization, curiosity, or intrinsic interest. Higher-constraint tasks may reveal strategy adaptation, frustration recovery, scaffold use, and flexible adjustment to new task demands.
 
-Observable signals may include:
+Spatial reasoning and problem-solving may be observed through:
 
-* spatial-fitting puzzles
-* shape rotation
+* spatial-fitting tasks
+* shape rotation and manipulation
 * part-whole structure
 * compact placement
 * visual pattern recognition
-* geometric equivalence
+* recognition of scaled shapes and proportions
+* geometric equivalence across representations 
 * familiar-shape-first approaches
-* close-packing strategies
 * trial-and-error adjustment
 * scaffold fading
-* response to changing constraint levels
+* adaptation to changing constraint levels
 
 This domain distinguishes between an entry strategy and adaptation. An entry strategy refers to how a learner begins a task, such as selecting familiar pieces or completing familiar patterns first. Adaptation refers to how the learner adjusts when the task changes, when the initial approach stops working, or when new constraints become visible.
 
@@ -128,7 +128,7 @@ The following are example observation categories derived from the core domains. 
 | Task type          | worksheet, spatial puzzle, chess, pretend shopping, Jiu Jitsu         |
 | Support type       | teacher modeling, reassurance, scaffolding, reframing                 |
 | Regulation event   | frustration, comparison, loss, overwhelm, recovery                    |
-| Strategy observed  | familiar-pattern-first, rotation, trial-and-error, close-packing      |
+| Strategy observed  | familiar-pattern-first, rotation, trial-and-error, compact placement      |
 | Motivation signal  | reward seeking, novelty seeking, visible completion, competitive play |
 | Constraint level   | low, moderate, high, scaffolded                                       |
 | Outcome marker     | completion, re-engagement, strategy shift, independent solution       |
@@ -138,7 +138,7 @@ The following are example observation categories derived from the core domains. 
 
 The observation framework defined in this document may later support a structured data schema or codebook. Categories will remain exploratory, and numerical ratings will be used to support pattern tracking rather than learner evaluation. These ratings are not formal assessments or validated measures.
 
-Future coding will prioritize pattern tracking over learner evaluation, prediction, diagnosis, or ranking. Qualitative notes will remain the primary source of interpretation, and cross-context flags will remain secondary and handled with caution to avoid claims of transfer or causation. Coding categories may change as new patterns emerge.
+Future coding will prioritize pattern tracking over learner evaluation, prediction, diagnosis, or ranking. Qualitative observations will remain the primary source of interpretation, while practitioner-generated quantitative ratings will support longitudinal pattern tracking and exploratory analysis. Cross-context flags will remain secondary and will be handled with caution to avoid claims of transfer or causation. Coding categories may change as new patterns emerge.
 
 Possible future fields include:
 
