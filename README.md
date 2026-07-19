@@ -48,7 +48,7 @@ Detailed privacy and anonymization practices are described in [Data Ethics & Ano
 
 This repository is in an active development phase. It currently contains project framing, research methodology, observation documentation, and the initial implementation of a medallion-layer data pipeline for a reproducible data management. 
 
-The 2025–2026 academic year observation cycle has been completed privately. The current development focuses on transforming those observational records into structured analytical datasets while preserving the original source data. Future work incldues completing the Silver and Gold layers of the pipeline, generating synthetic or anonymized datasets for demonstration, and developing exploratory analyses and visualizations to investigate longitudinal learning patterns.
+The 2025–2026 academic year observation cycle has been completed privately. The current development focuses on transforming those observational records into structured analytical datasets while preserving the original source data. Future work includes completing the Silver and Gold layers of the pipeline, generating synthetic or anonymized datasets for demonstration, and developing exploratory analyses and visualizations to investigate longitudinal learning patterns.
 
 ## Emerging Themes
 
