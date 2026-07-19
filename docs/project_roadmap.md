@@ -2,7 +2,7 @@
 
 ## Current Status
 
-Currently, the project is in Phase 2 while refining elements in Phase 1. 
+The project is in Phase 2 while refining elements in Phase 1. 
 
 ## Phase 1: Public Documentation
 

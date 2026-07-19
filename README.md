@@ -74,7 +74,9 @@ kuzushi/
 ├── data/                    # Raw data and pipeline snapshots used for development and testing
 ├── data_schema/             # Planned derived data schema, codebook, and sample anonymized structures
 ├── notebooks/               # Future exploratory analysis notebooks
+├── tests/                   # Automated tests for pipeline behavior
 └── src/                     # Future Python scripts for data structuring and analysis
+
 ```
 
 ## Next Steps
@@ -90,13 +92,17 @@ The next phase of Kuzushi will focus on strengthening the project's data and met
 
 ## Planned Technical Stack
 
-Future technical work may use Python-based tools for data structuring, exploratory analysis, and visualization. Planned tools include:
+Kuzushi is being developed using a Python-based data engineering and analysis workflow. Current and planned technologies include:
 
 * Python
-* pandas and NumPy for data cleaning and structuring
+* pandas and NumPy for data ingestion, cleaning, and data structuring
+* PyArrow for Parquet-based data storage
+* pytest for pipeline verification and regression testing
 * matplotlib for exploratory visualizations
 * Jupyter notebooks for analysis documentation
 * scikit-learn for possible exploratory pattern-recognition models
+
+The project adopts a medallion data architecture (Bronze, Silver, and Gold) to separate preserved source data from derived and analysis-ready datasets. This architecture supports reproducibility, traceability, and incremental development while also serving as a practical data engineering learning framework. 
 
 Any future modeling will be used cautiously and descriptively, with a focus on pattern exploration rather than prediction or evaluation of individual learners. 
 
