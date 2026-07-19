@@ -90,7 +90,7 @@ The next phase of Kuzushi will focus on strengthening the project's data and met
 * developing a public-facing Notion or portfolio page to organize project materials
 * continuing to document possible cross-context problem-solving patterns with caution 
 
-## Planned Technical Stack
+## Technical Stack
 
 Kuzushi is being developed using a Python-based data engineering and analysis workflow. Current and planned technologies include:
 
