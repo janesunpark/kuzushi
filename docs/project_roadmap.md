@@ -13,8 +13,10 @@ Currently, the project is in Phase 2 while refining elements in Phase 1.
 * year-end summary
 * selected Weekly Research Notes
 
-## Phase 2: Derived Data Schema
+## Phase 2: Data Pipeline & Derived Schema
 
+* establish medallion data architecture
+* develop reproducible data pipeline 
 * derived anonymized schema
 * codebook
 * sample synthetic/anonymized rows

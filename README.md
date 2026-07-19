@@ -71,6 +71,7 @@ kuzushi/
 ├── requirements.txt         # Python dependencies for future analysis scripts and notebooks
 ├── docs/                    # Methodology, ethics, observation framework, and roadmap
 ├── research_notes/          # Public-facing school-year summaries and Weekly Research Notes
+├── data/                    # Raw data and pipeline snapshots used for development and testing
 ├── data_schema/             # Planned derived data schema, codebook, and sample anonymized structures
 ├── notebooks/               # Future exploratory analysis notebooks
 └── src/                     # Future Python scripts for data structuring and analysis
@@ -78,9 +79,10 @@ kuzushi/
 
 ## Next Steps
 
-The next phase of Kuzushi will focus on strengthening the project's methodological foundation and preparing for future structured analysis. Planned next steps include:
+The next phase of Kuzushi will focus on strengthening the project's data and methodological foundation in preparation for future structured analysis. Planned next steps include:
 
-* developing the derived data schema and future codebook
+* building the foundational data pipeline for ingesting and preserving source data
+* developing the derived anonymized data schema and future codebook
 * creating sample anonymized or synthetic data structures 
 * building initial exploratory notebooks to visualize trends over time
 * developing a public-facing Notion or portfolio page to organize project materials
