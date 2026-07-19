@@ -14,9 +14,12 @@ __pycache__/
 # Jupyter
 .ipynb_checkpoints/
 
-# Raw and sensitive data
-data/raw/
-data/private/
+# Private observational data
+data/raw
+data/bronze
+
+# Internal project artifacts
+internal/
 
 # OS
 .DS_Store
