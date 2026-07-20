@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import pandas as pd
 
+
 def load_bronze_csv(filepath: str | Path) -> pd.DataFrame: 
 
   filepath = Path(filepath)
@@ -17,6 +18,7 @@ def load_bronze_csv(filepath: str | Path) -> pd.DataFrame:
   dataframe["ingestion_ts"] = ingestion_ts
 
   return dataframe
+
 
 def save_bronze_snapshot(dataframe: pd.DataFrame, dataset_name: str, output_dir: str | Path) -> Path:
   output_dir = Path(output_dir)
@@ -39,6 +41,7 @@ def save_bronze_snapshot(dataframe: pd.DataFrame, dataset_name: str, output_dir:
   dataframe.to_parquet(output_path, index=False)
   
   return output_path
+
 
 def load_bronze(raw_dir: str | Path, bronze_dir: str | Path) -> dict[str, pd.DataFrame]:
 
@@ -72,6 +75,7 @@ def load_bronze(raw_dir: str | Path, bronze_dir: str | Path) -> dict[str, pd.Dat
     raise
   
   return bronze_dict
+
 
 if __name__ == "__main__":
   
