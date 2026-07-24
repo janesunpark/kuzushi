@@ -18,6 +18,10 @@ def _generate_rng(seed: int) -> np.random.Generator:
 
   return rng
 
+def _week_ending_for(d: date) -> date:
+  monday = d - timedelta(days=d.weekday())
+  return monday + timedelta(days=6)
+
 
 def _remove_random_off_weeks(
     schedule: list[dict],
@@ -94,7 +98,7 @@ def generate_academic_schedule(
   ]
 
   while current_week <= end:
-    week_ending = current_week + timedelta(days=6)
+    week_ending = _week_ending_for(current_week)
 
     if current_week < spring_start_monday:
       weekday_offsets = fall_offsets
@@ -238,7 +242,7 @@ def generate_jiu_jitsu_observations(
         observations.append(
           {
             "student_id": student_id,
-            "datetime": observation_datetime
+            "observed_at": observation_datetime
           }
         )
 
@@ -252,8 +256,64 @@ def generate_jiu_jitsu_observations(
       observation_date += timedelta(days=interval_days)
 
   observations.sort(
-    key=lambda record: record["datetime"]
+    key=lambda record: record["observed_at"]
   )
 
   return observations
 
+
+def combine_schedules(
+    seed: int,
+    n_random_off_weeks: int=2,
+) -> list[dict]:
+  
+  rng = _generate_rng(seed)
+
+  combined_schedule = []
+
+  academic_schedule = generate_academic_schedule(START, END, rng, n_random_off_weeks)
+  jj_schedule = generate_jiu_jitsu_observations(START, END, rng)
+
+  academic_week_endings = {
+    week["week_ending"]
+    for week in academic_schedule
+  }
+
+  jj_observation_weeks = {
+    _week_ending_for(
+      observation["observed_at"].date()
+    )
+    for observation in jj_schedule
+  }
+
+  combined_week_endings = (
+    academic_week_endings | jj_observation_weeks
+  )
+  
+  sorted_week_endings = sorted(combined_week_endings)
+  
+  for week_ending in sorted_week_endings:
+    academic_entry = next(
+      (week
+      for week in academic_schedule
+      if week["week_ending"] == week_ending
+      ),
+      None,
+    )
+
+    jj_observations_for_week = [
+      observation
+      for observation in jj_schedule
+      if _week_ending_for(
+        observation["observed_at"].date()
+      ) == week_ending
+    ]
+    combined_schedule.append(
+      {
+        "week_ending": week_ending,
+        "academic": academic_entry,
+        "jiu_jitsu": jj_observations_for_week,
+      }
+    )
+  
+  return combined_schedule
