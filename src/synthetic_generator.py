@@ -2,10 +2,16 @@ from datetime import date, datetime, time, timedelta
 
 import numpy as np
 
+# =================================================================================
+# Configuration
+# =================================================================================
 
 START = date(2025, 8, 17)
 END = date(2026, 6, 14)
 
+# =================================================================================
+# Shared helper functions
+# =================================================================================
 
 def _generate_rng(seed: int) -> np.random.Generator:
 
@@ -17,6 +23,7 @@ def _generate_rng(seed: int) -> np.random.Generator:
   rng = np.random.default_rng(seed)
 
   return rng
+
 
 def _week_ending_for(d: date) -> date:
   monday = d - timedelta(days=d.weekday())
@@ -30,7 +37,9 @@ def _remove_random_off_weeks(
 ) -> list[dict]:
   
   if n_random_off_weeks >= len(schedule):
-    raise ValueError("Number of off-weeks must be less than number of weeks in the observation cycle.")
+    raise ValueError(
+      "Number of off-weeks must be less than number of weeks in the observation cycle."
+      )
   
   eligible_indices = list(range(len(schedule)))
   rng.shuffle(eligible_indices)
@@ -66,6 +75,9 @@ def _generate_break_periods(
 
   return break_periods
 
+# =================================================================================
+# Schedule generators
+# =================================================================================
 
 def generate_academic_schedule(
     start: date,
@@ -262,6 +274,141 @@ def generate_jiu_jitsu_observations(
   return observations
 
 
+def generate_s03_observations(
+    start: date,
+    end: date,
+    rng: np.random.Generator,
+) -> list[dict]:
+
+  if start > end:
+    raise ValueError("Start date must not be after end date.")
+  
+  s03_observations = []
+
+  spring_start = date(start.year + 1, 1, 1)
+  spring_start_monday = (
+    spring_start - timedelta(days=spring_start.weekday())
+  )
+
+  if end >= spring_start_monday:
+    raise ValueError("End date must be within the start year.")
+
+  adult_jj_times = [
+    time(6, 15),
+    time(19, 30),
+    time(20, 30),
+  ]
+
+  daytime_class_times = [
+    time(8, 0),
+    time(10, 0),
+    time(11, 30),
+    time(13, 0),
+  ]
+
+  break_periods = _generate_break_periods(start, end)
+
+  current_week = _week_ending_for(start)
+
+  while current_week <= end: 
+
+    week_start = current_week - timedelta(days=6)
+
+    valid_start = max(week_start, start)
+    valid_end = min(current_week, end)
+    valid_dates = [
+      valid_start + timedelta(days=offset)
+      for offset in range(
+        (valid_end - valid_start).days + 1
+      ) if not any(
+        break_start <= valid_start + timedelta(days=offset) <= break_end
+        for break_start, break_end in break_periods
+      )
+    ]
+
+    if not valid_dates:
+      current_week += timedelta(days=7)
+      continue
+
+    observation_date = rng.choice(
+      valid_dates
+    )
+
+    observation_time = rng.choice(
+        daytime_class_times
+      )
+    
+    context = str(
+      rng.choice(
+        [
+          "College Course - Logical Reasoning (Math and CS)",
+          "Weight Training",
+        ],
+        p=[0.6, 0.4],
+      )
+    )
+
+    s03_observations.append(
+      {
+        "student_id": "S03",
+        "context": context,
+        "observed_at": datetime.combine(
+          observation_date,
+          observation_time,
+        ),
+      }
+    )
+
+    available_jj_datetimes = [
+      datetime.combine(
+        jj_date, 
+        jj_time,
+      ) 
+      for jj_date in valid_dates
+      for jj_time in adult_jj_times
+    ]
+
+    jj_observations_this_week = int(
+      rng.choice(
+        [1, 2, 3],
+        p=[0.3, 0.6, 0.1],
+      )
+    )
+
+    if jj_observations_this_week > len(available_jj_datetimes):
+      raise ValueError(
+        "Not enough unique Jiu-Jitsu timestamps "
+        " for the requested weekly observations."
+      ) 
+
+    selected_indices = rng.choice(
+      len(available_jj_datetimes),
+      size=jj_observations_this_week,
+      replace=False,
+    )
+
+    for index in selected_indices:
+      jj_observed_at = available_jj_datetimes[int(index)]   
+
+      s03_observations.append(
+        {
+          "student_id": "S03",
+          "context": "Jiu-Jitsu",
+          "observed_at": jj_observed_at,
+        }
+      )
+
+    current_week += timedelta(days=7)
+
+  return sorted(
+    s03_observations,
+    key=lambda observation: observation["observed_at"],
+  )
+
+# =================================================================================
+# Schedule orchestration
+# =================================================================================
+
 def combine_schedules(
     seed: int,
     n_random_off_weeks: int=2,
@@ -293,6 +440,7 @@ def combine_schedules(
   sorted_week_endings = sorted(combined_week_endings)
   
   for week_ending in sorted_week_endings:
+
     academic_entry = next(
       (week
       for week in academic_schedule
@@ -308,6 +456,7 @@ def combine_schedules(
         observation["observed_at"].date()
       ) == week_ending
     ]
+
     combined_schedule.append(
       {
         "week_ending": week_ending,
