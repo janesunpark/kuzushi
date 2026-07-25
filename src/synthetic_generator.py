@@ -173,6 +173,7 @@ def generate_academic_schedule(
     schedule.append(
       {
         "week_ending": week_ending,
+        "student_id": ["S01", "S02"],
         "num_sessions": len(meeting_dates),
         "meeting_dates": meeting_dates, 
       }
@@ -253,8 +254,8 @@ def generate_jiu_jitsu_observations(
 
         observations.append(
           {
-            "student_id": student_id,
-            "observed_at": observation_datetime
+            "student_id": [student_id],
+            "observed_at": observation_datetime,
           }
         )
 
@@ -335,8 +336,8 @@ def generate_s03_observations(
     )
 
     observation_time = rng.choice(
-        daytime_class_times
-      )
+      daytime_class_times
+    )
     
     context = str(
       rng.choice(
@@ -350,7 +351,7 @@ def generate_s03_observations(
 
     s03_observations.append(
       {
-        "student_id": "S03",
+        "student_id": ["S03"],
         "context": context,
         "observed_at": datetime.combine(
           observation_date,
@@ -392,7 +393,7 @@ def generate_s03_observations(
 
       s03_observations.append(
         {
-          "student_id": "S03",
+          "student_id": ["S03"],
           "context": "Jiu-Jitsu",
           "observed_at": jj_observed_at,
         }
@@ -466,3 +467,54 @@ def combine_schedules(
     )
   
   return combined_schedule
+
+
+def derive_session_rows(
+    combined_schedule: list[dict]
+) -> list[dict]:
+
+  # Expected
+
+  derived_session_rows = []
+
+  for week in combined_schedule:
+
+    true_week_ending = week["week_ending"]
+
+    # ---------------------------------------------------------
+    # Academic observations
+    # ---------------------------------------------------------
+    
+    academic = week["academic"]
+
+    if academic is not None:
+      for timestamp in academic["meeting_dates"]:
+        for student_id in academic["student_id"]:
+          derived_session_rows.append(
+            {
+              "true_week_ending": true_week_ending,
+              "timestamp": timestamp,
+              "student_id": student_id,
+              "observation_context": "Enrichment",
+            }
+          )
+
+    # ---------------------------------------------------------
+    # Jiu-Jitsu observations
+    # ---------------------------------------------------------
+
+    for jj_observation in week["jiu_jitsu"]:
+      for student_id in jj_observation["student_id"]:
+        derived_session_rows.append(
+          {
+            "true_week_ending": true_week_ending,
+            "timestamp": jj_observation["observed_at"],
+            "student_id": student_id,
+            "observation_context": "Jiu-Jitsu",
+          }
+        )
+
+  return sorted(
+    derived_session_rows,
+    key=lambda row: row["timestamp"]
+  )
