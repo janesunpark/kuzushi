@@ -62,3 +62,29 @@ The Bronze layer of the pipeline is meant to be an immutable, as-close-to-raw co
 - Trusting a fresh timestamp per run (immutability option a) holds for the intended call pattern (loader → saver, every time), but leaves a silent gap if the save function is ever called twice on an already-loaded DataFrame — a real, tested scenario where it would silently overwrite. The explicit existence-check guard costs one cheap check per save and turns a possible silent data-loss bug into a loud, immediate, descriptive error instead.
 - Single-pass load-and-save (atomicity option a) is simpler code, but was verified to leave an orphaned single-dataset snapshot on disk when a second file's load or save failed partway through — a state with no clean interpretation for downstream reconciliation logic expecting a matched pair. Load-everything-then-save-everything, with rollback on partial failure, was verified across all three relevant cases (full success, load-phase failure, save-phase failure after partial success) to guarantee the loader either fully succeeds or leaves no observable trace — which is what makes it safe to re-run after a failure without manual disk cleanup.
 
+---
+
+## Milestone 2 — Selecting weeks to skew, not rows
+
+*Internal cross-reference: blueprint §12, Entries 26–27.*
+
+**Problem**
+
+Simulating realistic data-entry defects requires shifting some rows' apparent timestamps so they land in the wrong week — but doing this by sampling individual rows produced three distinct bugs, only found by running the code and checking actual output: a whole session's late entry should move together, not split across students; a week-selection loop was silently dropping the first selected week; and rows were being mutated before being copied, corrupting the caller's original list despite the function nominally returning a new one.
+
+**Options considered**
+
+1. Patch each of the three symptoms individually while still sampling at the row level.
+2. Restructure around sampling *weeks* — enumerate unique `true_week_ending` values, exclude the most recent, sample `n` of the rest without replacement, then copy-and-conditionally-shift every row in one pass.
+
+**Chosen solution**
+
+Option 2.
+
+This reuses the enumerate → guard → sample-unique → order idiom first named in Milestone 0, applied here at the granularity of weeks rather than timestamps.
+
+**Trade-offs**
+
+- Option 1 would need three separate fixes for symptoms of one root cause, and would still leave a subtler bias unaddressed: sampling from a flat row list weights each week's selection probability by how many rows it happens to contribute, so a 2-session week is twice as likely to be picked as a 1-session week. Option 2 fixes all three bugs and the weighting bias in one restructuring.
+- The function still requires two linear passes over the row list (one to enumerate eligible weeks, one to copy-and-shift), not one — a cost accepted deliberately, since correctly excluding "the last eligible week" and sampling fairly from the rest both require seeing the complete set of weeks before any row can be touched. A single-pass alternative (reservoir sampling) exists for exactly this shape of problem, but it's designed for streams too large to hold in memory or whose size isn't known in advance; at 168 rows, neither condition applies, so reaching for it would be solving a problem this dataset doesn't have.
+
