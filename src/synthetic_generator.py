@@ -102,11 +102,11 @@ def generate_academic_schedule(
   spring_offsets = [0, 2]
 
   fall_times = [
-    time(15, 30),
+    time(13, 30),
   ]
 
   spring_times = [
-    time(17, 0),
+    time(14, 30),
   ]
 
   while current_week <= end:
@@ -203,7 +203,7 @@ def generate_jiu_jitsu_observations(
 
   observation_times = [
     time(15, 30),
-    time(14, 30),
+    time(16, 30),
     time(17, 30),
   ]
 
@@ -304,7 +304,6 @@ def generate_s03_observations(
     time(8, 0),
     time(10, 0),
     time(11, 30),
-    time(13, 0),
   ]
 
   break_periods = _generate_break_periods(start, end)
@@ -473,20 +472,13 @@ def derive_session_rows(
     combined_schedule: list[dict]
 ) -> list[dict]:
 
-  # Expected
-
   derived_session_rows = []
 
   for week in combined_schedule:
 
     true_week_ending = week["week_ending"]
 
-    # ---------------------------------------------------------
-    # Academic observations
-    # ---------------------------------------------------------
-    
     academic = week["academic"]
-
     if academic is not None:
       for timestamp in academic["meeting_dates"]:
         for student_id in academic["student_id"]:
@@ -498,10 +490,6 @@ def derive_session_rows(
               "observation_context": "Enrichment",
             }
           )
-
-    # ---------------------------------------------------------
-    # Jiu-Jitsu observations
-    # ---------------------------------------------------------
 
     for jj_observation in week["jiu_jitsu"]:
       for student_id in jj_observation["student_id"]:
@@ -518,3 +506,55 @@ def derive_session_rows(
     derived_session_rows,
     key=lambda row: row["timestamp"]
   )
+
+
+def inject_timestamp_skew(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    n_skewed_weeks: int=2,
+) -> list[dict]:
+
+  eligible_week_endings = sorted({
+    row["true_week_ending"]
+    for row in session_rows
+    if row["observation_context"] == "Enrichment"
+  })
+
+  selectable_week_endings = eligible_week_endings[:-1]
+
+  if n_skewed_weeks > len(selectable_week_endings):
+    raise ValueError(
+      "Number of skewed weeks cannot exceed "
+      "the number of selectable Enrichment weeks."
+    )
+
+  selected_indices = rng.choice(
+    len(selectable_week_endings),
+    size=n_skewed_weeks,
+    replace=False,
+  )
+
+  selected_week_endings = {
+    selectable_week_endings[int(index)]
+    for index in selected_indices
+  }
+
+  skewed_schedule = []
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if (
+      new_row["observation_context"] == "Enrichment"
+      and new_row["true_week_ending"] in selected_week_endings
+    ):
+      new_row["timestamp"] += timedelta(days=7)
+
+    skewed_schedule.append(new_row)
+
+  return sorted(
+    skewed_schedule,
+    key=lambda row: row["timestamp"]
+  )
+
+
