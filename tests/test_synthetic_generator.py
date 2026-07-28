@@ -33,6 +33,7 @@ def test_same_seed_expected_row_count():
   row = derive_session_rows(
     combine_schedules(42, 2)
   )
+
   assert len(row) == 169
 
 
@@ -43,6 +44,7 @@ def test_same_seed_produces_same_rows():
   rows2 = derive_session_rows(
     combine_schedules(42, 2)
   )
+  
   assert rows1 == rows2
 
 

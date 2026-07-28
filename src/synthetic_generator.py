@@ -508,19 +508,41 @@ def derive_session_rows(
   )
 
 
+def generate_synthesis_log_rows(
+    combined_schedule: list[dict],
+    n_skipped_weeks: int=0,
+) -> list[dict]:
+
+  if n_skipped_weeks > len(combined_schedule):
+    raise ValueError(
+      "Number of weeks to be skipped cannot exceed the number of recorded sessions."
+    )
+
+  synthesis_logs_rows = []
+  
+  for session in combined_schedule[n_skipped_weeks:]:
+    if session["academic"] is not None:
+      synthesis_logs_rows.append(
+        {
+          "week_ending": session["week_ending"],
+          "num_sessions_reported": session["academic"]["num_sessions"],
+        }
+      )
+
+  return synthesis_logs_rows
+
+
 def inject_timestamp_skew(
     session_rows: list[dict],
+    synthesis_log_rows: list[dict],
     rng: np.random.Generator,
     n_skewed_weeks: int=2,
 ) -> list[dict]:
 
-  eligible_week_endings = sorted({
-    row["true_week_ending"]
-    for row in session_rows
-    if row["observation_context"] == "Enrichment"
-  })
-
-  selectable_week_endings = eligible_week_endings[:-1]
+  selectable_week_endings = [
+    row["week_ending"]
+    for row in synthesis_log_rows[:-1]
+  ]
 
   if n_skewed_weeks > len(selectable_week_endings):
     raise ValueError(
@@ -535,8 +557,8 @@ def inject_timestamp_skew(
   )
 
   selected_week_endings = {
-    selectable_week_endings[int(index)]
-    for index in selected_indices
+    selectable_week_endings[i]
+    for i in selected_indices
   }
 
   skewed_schedule = []
@@ -556,5 +578,4 @@ def inject_timestamp_skew(
     skewed_schedule,
     key=lambda row: row["timestamp"]
   )
-
 
