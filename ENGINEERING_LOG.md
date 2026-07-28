@@ -88,3 +88,32 @@ This reuses the enumerate → guard → sample-unique → order idiom first name
 - Option 1 would need three separate fixes for symptoms of one root cause, and would still leave a subtler bias unaddressed: sampling from a flat row list weights each week's selection probability by how many rows it happens to contribute, so a 2-session week is twice as likely to be picked as a 1-session week. Option 2 fixes all three bugs and the weighting bias in one restructuring.
 - The function still requires two linear passes over the row list (one to enumerate eligible weeks, one to copy-and-shift), not one — a cost accepted deliberately, since correctly excluding "the last eligible week" and sampling fairly from the rest both require seeing the complete set of weeks before any row can be touched. A single-pass alternative (reservoir sampling) exists for exactly this shape of problem, but it's designed for streams too large to hold in memory or whose size isn't known in advance; at 168 rows, neither condition applies, so reaching for it would be solving a problem this dataset doesn't have.
 
+---
+
+## Milestone 3 — Choosing what feeds `generate_synthesis_log_rows`, and coordinating it with `inject_timestamp_skew`
+
+*Internal cross-reference: blueprint §12, Entry 28.*
+
+**Problem**
+
+`generate_synthesis_log_rows` needed to produce week-level synthesis ground truth (`week_ending`, `num_sessions_reported`) for later reconciliation testing. Two decisions were entangled here: what representation should feed this function, and how it relates to the already-existing `inject_timestamp_skew` step.
+
+On the first: `combine_schedules` already produces week-structured records with true session counts attached; `derive_session_rows` instead flattens that same information into individual observation-level rows. Deriving synthesis rows from the flattened row-level output would mean re-aggregating rows back into weekly counts — effectively reimplementing a simplified version of the real Silver-layer reconciliation logic (`expected_rows = num_sessions_reported × 2`, compared against actual row counts) inside the fixture generator itself, before the pipeline being tested even exists.
+
+On the second: once `generate_synthesis_log_rows` and `inject_timestamp_skew` were both built independently on top of `combined_schedule`, cross-checking them revealed a real gap — one of two deliberately-skewed weeks fell before synthesis practice began in the simulated timeline, producing a week with no corresponding synthesis note to reconcile against at all, silently wasting half the planted test cases.
+
+**Options considered**
+
+- Representation source: (a) derive synthesis rows from `derive_session_rows`'s flattened output, re-aggregating row counts back up to the week level; (b) derive synthesis rows directly from `combined_schedule`, which already carries week-level ground truth.
+- Skew/coverage coordination: (a) keep `generate_synthesis_log_rows` and `inject_timestamp_skew` independent and accept that some skewed weeks may fall outside synthesis coverage; (b) have `inject_timestamp_skew` select only from weeks that `generate_synthesis_log_rows` actually produced an entry for, and re-parameterize the synthesis-note start as `n_skipped_weeks: int` instead of a hardcoded calendar date.
+
+**Chosen solution**
+
+(b) for both.
+
+**Trade-offs**
+
+- Deriving synthesis rows from flattened session rows (representation option a) would work, but blurs a line worth keeping clean: the generator's job is to produce ground truth and deliberately corrupted derived views of it, not to pre-validate itself. If the fixture generator re-implements even a simplified version of the reconciliation logic the real pipeline is supposed to be tested against, a bug shared between the two would be invisible — the fixture and the system under test would be grading each other's homework instead of one acting as an independent check on the other. Deriving directly from `combined_schedule` (option b) keeps the two projections — observation-level rows and week-level synthesis summaries — as independent views of the same underlying truth, joined explicitly later, rather than one being derived from a flattened form of the other.
+- This mirrors a decision already made in the real production schema (blueprint §1): `fact_session` and `fact_weekly_synthesis` are treated as two different fact tables at genuinely different grains, connected by an explicit grain-mismatch join, not collapsed into a single natural-key merge. The generator arriving at the same shape independently is a good sign the underlying principle — don't force one grain to be derived from another when both are legitimate views of the same reality — is being applied consistently, not just remembered once.
+- Coordinating skew selection with synthesis coverage (option b) required threading `synthesis_log_rows` into `inject_timestamp_skew` as an input and reordering the pipeline so synthesis rows are generated before skew is injected — more coupling between the two functions than treating them independently (option a). But independence was shown, on a real seed, to silently produce non-functional test cases: a skewed week with no synthesis note to reconcile against is indistinguishable from any other uncovered week, defeating the purpose of planting it. Re-verified directly after the fix: both skewed weeks are now confirmed present in the synthesis log with matching true counts.
+- Reparameterizing the synthesis-note start as `n_skipped_weeks: int` instead of a calendar date gives `n=0` a clean, portable meaning ("no gap") that will still hold for a future observation cycle with no pre-synthesis gap at all, without needing to recompute a date every time. One residual imprecision, not a bug: `n_skipped_weeks` counts raw positions in `combined_schedule`, which includes Jiu-Jitsu-only weeks alongside academic ones, so "skip N" and "skip N *eligible* weeks" aren't quite identical — close enough for this generator's realism standard, but worth knowing if a future use ever needs an exact row-count target.
