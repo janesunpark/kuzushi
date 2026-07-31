@@ -487,6 +487,7 @@ def derive_session_rows(
               "true_week_ending": true_week_ending,
               "timestamp": timestamp,
               "student_id": student_id,
+              "session_category": "Enrichment",
               "observation_context": "Enrichment",
             }
           )
@@ -498,6 +499,7 @@ def derive_session_rows(
             "true_week_ending": true_week_ending,
             "timestamp": jj_observation["observed_at"],
             "student_id": student_id,
+            "session_category": "Jiu-Jitsu",
             "observation_context": "Jiu-Jitsu",
           }
         )
@@ -530,6 +532,65 @@ def generate_synthesis_log_rows(
       )
 
   return synthesis_logs_rows
+
+
+def assign_observer_id(
+    session_rows: list[dict],
+    transition_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if new_row["true_week_ending"] >= transition_week:
+      new_row["observer_id"] = "T01"
+    else: 
+      new_row["observer_id"] = "T0"
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_observation_context(
+  session_rows: list[dict],
+  rng: np.random.Generator,
+) -> list[dict]:
+
+  meeting_categories = {}
+  finalized_rows = []
+
+  categories = [
+    "Enrichment (Sibling Dyad)",
+    "Enrichment: Group Session",
+    "Enrichment: Group Activity",
+  ]
+
+  probabilities = np.array([74, 43, 12]) / (74 + 43 + 12)
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if new_row["session_category"] == "Enrichment":
+      session_key = new_row["timestamp"]
+
+      if session_key not in meeting_categories:
+        meeting_categories[session_key] = str(
+          rng.choice(
+            categories,
+            p=probabilities,
+          )
+        )
+
+      new_row["observation_context"] = (
+        meeting_categories[session_key]
+      )
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
 
 
 def inject_timestamp_skew(
@@ -567,7 +628,7 @@ def inject_timestamp_skew(
     new_row = row.copy()
 
     if (
-      new_row["observation_context"] == "Enrichment"
+      new_row["session_category"] == "Enrichment"
       and new_row["true_week_ending"] in selected_week_endings
     ):
       new_row["timestamp"] += timedelta(days=7)
