@@ -11,12 +11,15 @@ from synthetic_generator import (
   generate_synthesis_log_rows,
   assign_observer_id,
   assign_observation_context,
+  assign_core_ratings,
   inject_timestamp_skew,
 )
+
 
 # =============================================================================
 # RNG behavior
 # =============================================================================
+
 
 def test_same_seed_same_output():
   rng1 = _generate_rng(42)
@@ -37,9 +40,11 @@ def test_shared_rng_advances_state():
 
   assert first != second
 
+
 # =============================================================================
 # Schedule derivation
 # =============================================================================
+
 
 def test_same_seed_expected_row_count():
   rows = derive_session_rows(
@@ -59,9 +64,11 @@ def test_same_seed_produces_same_rows():
   
   assert rows1 == rows2
 
+
 # =============================================================================
 # Observer assignment
 # =============================================================================
+
 
 def test_assign_observer_id_does_not_mutate_input():
   session_rows = derive_session_rows(
@@ -100,9 +107,11 @@ def test_observer_id_shifts_at_transition_week():
 
   assert rows1 == rows2
 
+
 # =============================================================================
 # Observation context assignment
 # =============================================================================
+
 
 def test_assign_observation_context_does_not_mutate_input():
   session_rows = derive_session_rows(
@@ -182,9 +191,131 @@ def test_assign_observation_context_preserves_jiu_jitsu_context():
         assigned["observation_context"] == "Jiu-Jitsu"
       )
 
+
+# =============================================================================
+# Core ratings
+# =============================================================================
+
+
+def test_assign_core_ratings_does_not_mutate_input():
+  session_rows = derive_session_rows(
+    combine_schedules(42, 2)
+  )
+
+  original_rows = [
+    row.copy()
+    for row in session_rows
+  ]
+
+  assign_core_ratings(
+    session_rows,
+    _generate_rng(42),
+  )
+
+  assert session_rows == original_rows
+
+
+def test_assign_core_ratings_same_seed_same_output():
+  session_rows = derive_session_rows(
+    combine_schedules(42, 2)
+  )
+
+  rows1 = assign_core_ratings(
+    session_rows,
+    _generate_rng(42),
+  )
+
+  rows2 = assign_core_ratings(
+    session_rows,
+    _generate_rng(42),
+  )
+
+  assert rows1 == rows2
+
+
+def test_assign_core_ratings_shared_rng_advances_state():
+  session_rows = derive_session_rows(
+    combine_schedules(42, 2)
+  )
+
+  rng = _generate_rng(42)
+
+  rows1 = assign_core_ratings(
+    session_rows,
+    rng,
+  )
+
+  rows2 = assign_core_ratings(
+    session_rows,
+    rng,
+  )
+
+  assert rows1 != rows2
+
+
+def test_core_ratings_are_between_one_and_five():
+  session_rows = derive_session_rows(
+    combine_schedules(42, 2)
+  )
+
+  assigned_rows = assign_core_ratings(
+    session_rows,
+    _generate_rng(42),
+  )
+
+  rating_columns = [
+    "Focus or Attention",
+    "Carryover or Retention",
+    "Confidence, Autonomy, or Initiative",
+  ]
+
+  for row in assigned_rows:
+    for column in rating_columns:
+      assert row[column] in {1, 2, 3, 4, 5}
+
+
+def test_every_row_receives_core_ratings():
+  session_rows = derive_session_rows(
+    combine_schedules(42, 2)
+  )
+
+  assigned_rows = assign_core_ratings(
+    session_rows,
+    _generate_rng(42),
+  )
+
+  rating_colunns = [
+    "Focus or Attention",
+    "Carryover or Retention",
+    "Confidence, Autonomy, or Initiative",
+  ]
+
+  for row in assigned_rows:
+    for column in rating_colunns:
+      assert row[column] is not None
+
+
+def test_assign_core_ratings_preserves_existing_columns():
+  session_rows = derive_session_rows(
+    combine_schedules(42, 2)
+  )
+
+  assigned_rows = assign_core_ratings(
+    session_rows,
+    _generate_rng(42),
+  )
+
+  for original, assigned in zip(session_rows, assigned_rows):
+    assert original["student_id"] == assigned["student_id"]
+    assert original["timestamp"] == assigned["timestamp"]
+    assert original["session_category"] == assigned["session_category"]
+    assert original["observation_context"] == assigned["observation_context"]
+
+      
 # =============================================================================
 # Timestamp skew
 # =============================================================================
+
 
 def test_timestamp_skew_does_not_mutate_original_rows():
   session_rows = derive_session_rows(

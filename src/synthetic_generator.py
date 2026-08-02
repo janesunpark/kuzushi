@@ -2,16 +2,20 @@ from datetime import date, datetime, time, timedelta
 
 import numpy as np
 
+
 # =================================================================================
 # Configuration
 # =================================================================================
 
+
 START = date(2025, 8, 17)
 END = date(2026, 6, 14)
+
 
 # =================================================================================
 # Shared helper functions
 # =================================================================================
+
 
 def _generate_rng(seed: int) -> np.random.Generator:
 
@@ -75,9 +79,11 @@ def _generate_break_periods(
 
   return break_periods
 
+
 # =================================================================================
 # Schedule generators
 # =================================================================================
+
 
 def generate_academic_schedule(
     start: date,
@@ -405,9 +411,11 @@ def generate_s03_observations(
     key=lambda observation: observation["observed_at"],
   )
 
+
 # =================================================================================
 # Schedule orchestration
 # =================================================================================
+
 
 def combine_schedules(
     seed: int,
@@ -593,6 +601,65 @@ def assign_observation_context(
   return finalized_rows
 
 
+def assign_core_ratings(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  student_weights = {
+      "S01": {
+        "Focus or Attention": {
+          "ratings": [1, 2, 3, 4, 5],
+          "weights": np.array([3, 7, 19, 27, 18])/74,
+        },
+        "Carryover or Retention": {
+          "ratings": [1, 2, 3, 4, 5],
+          "weights": np.array([1, 2, 26, 30, 15])/74,
+        },
+        "Confidence, Autonomy, or Initiative": {
+          "ratings": [1, 2, 3, 4, 5],
+          "weights": np.array([1, 4, 18, 27, 24])/74,
+        }
+      },
+      "S02": {
+        "Focus or Attention": {
+          "ratings": [1, 2, 3, 4, 5],
+          "weights": np.array([3, 10, 28, 25, 14])/80,
+        },
+        "Carryover or Retention": {
+          "ratings": [1, 2, 3, 4, 5],
+          "weights": np.array([0, 5, 32, 29, 14])/80,
+        },
+        "Confidence, Autonomy, or Initiative": {
+          "ratings": [1, 2, 3, 4, 5],
+          "weights": np.array([3, 6, 23, 25, 23])/80,
+        }
+      }
+    }
+
+  for row in session_rows:
+
+    new_row = row.copy()
+
+    student_id = new_row["student_id"]
+    distributions = student_weights[student_id]
+
+    for domain, distribution in distributions.items():
+
+      new_row[domain] = int(
+        rng.choice(
+          distribution["ratings"],
+          p=distribution["weights"],
+        )
+      )
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
 def inject_timestamp_skew(
     session_rows: list[dict],
     synthesis_log_rows: list[dict],
@@ -640,3 +707,43 @@ def inject_timestamp_skew(
     key=lambda row: row["timestamp"]
   )
 
+import pandas as pd
+
+seed = 42
+rng = _generate_rng(seed)
+
+rows = derive_session_rows(
+    combine_schedules(seed, 2)
+)
+
+rows = assign_observer_id(
+    rows,
+    date(2025, 12, 7),
+)
+
+rows = assign_observation_context(
+    rows,
+    rng,
+)
+
+rows = assign_core_ratings(
+    rows,
+    rng,
+)
+
+df = pd.DataFrame(rows)
+
+print(
+    df[
+        [
+            "timestamp",
+            "student_id",
+            "session_category",
+            "observation_context",
+            "observer_id",
+            "Focus or Attention",
+            "Carryover or Retention",
+            "Confidence, Autonomy, or Initiative",
+        ]
+    ].head(15)
+)
