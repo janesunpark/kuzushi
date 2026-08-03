@@ -117,3 +117,29 @@ On the second: once `generate_synthesis_log_rows` and `inject_timestamp_skew` we
 - This mirrors a decision already made in the real production schema (blueprint §1): `fact_session` and `fact_weekly_synthesis` are treated as two different fact tables at genuinely different grains, connected by an explicit grain-mismatch join, not collapsed into a single natural-key merge. The generator arriving at the same shape independently is a good sign the underlying principle — don't force one grain to be derived from another when both are legitimate views of the same reality — is being applied consistently, not just remembered once.
 - Coordinating skew selection with synthesis coverage (option b) required threading `synthesis_log_rows` into `inject_timestamp_skew` as an input and reordering the pipeline so synthesis rows are generated before skew is injected — more coupling between the two functions than treating them independently (option a). But independence was shown, on a real seed, to silently produce non-functional test cases: a skewed week with no synthesis note to reconcile against is indistinguishable from any other uncovered week, defeating the purpose of planting it. Re-verified directly after the fix: both skewed weeks are now confirmed present in the synthesis log with matching true counts.
 - Reparameterizing the synthesis-note start as `n_skipped_weeks: int` instead of a calendar date gives `n=0` a clean, portable meaning ("no gap") that will still hold for a future observation cycle with no pre-synthesis gap at all, without needing to recompute a date every time. One residual imprecision, not a bug: `n_skipped_weeks` counts raw positions in `combined_schedule`, which includes Jiu-Jitsu-only weeks alongside academic ones, so "skip N" and "skip N *eligible* weeks" aren't quite identical — close enough for this generator's realism standard, but worth knowing if a future use ever needs an exact row-count target.
+
+---
+
+## Milestone 4 — The one function breaking `rng` convention, found only by integration testing
+
+*Internal cross-reference: blueprint §13, Entry 36.*
+
+**Problem**
+
+Every function in the generator accepts `rng: np.random.Generator` directly, threading one continuously-advancing stream through the whole pipeline — except `combine_schedules`, which took a raw `seed: int` and built its own internal generator from scratch, with no way to supply or retrieve the shared stream. This was invisible as long as `combine_schedules` was tested only in isolation. A hand-built integration script composing the full pipeline — schedule generation through every enrichment step, the first genuine end-to-end run of the whole thing — surfaced it directly: the outer `rng` created for the enrichment steps produced, as its first draw after `combine_schedules` returned, a value identical to a completely fresh generator's first draw — proof `combine_schedules` had never touched the shared stream at all.
+
+**Options considered**
+
+1. Leave `combine_schedules` taking a raw seed, treating schedule generation and row enrichment as two separately-reproducible phases rather than one continuous pipeline.
+2. Change its signature to accept `rng` directly, matching every other function, with the caller responsible for creating one generator from a single top-level seed and threading it through the entire pipeline, `combine_schedules` included.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 would have been a permanent, quiet inconsistency — the one function in the whole file not following its own established convention, discoverable only by explicitly checking draw-for-draw equality against a fresh generator, which is a non-obvious thing to think to check in the first place. Option 2 is a small, mechanical signature change, but was necessary for the "one seed reproduces the entire synthetic dataset" property to actually hold end-to-end, rather than being true only within each phase separately. Re-verified directly after the fix: the draw taken immediately after `combine_schedules` returns no longer matches a fresh generator's first draw, and the complete pipeline reproduces identically under a matching seed and diverges under a different one.
+- The lesson here is sharper than "run the code, don't just read it" (Milestones 1 and 2's theme): every individual function was already correct in isolation — unit-level testing of `combine_schedules` alone would never have surfaced this, because the defect only exists in how functions compose together. Only a genuine integration test (here, a plain inspection script rather than a formal one) could catch it. A system where every component follows a convention except the one composing them is a specific, findable smell — and it's specifically invisible to testing components one at a time.
+
+*A separate, unrelated fix landed in the same pass, worth noting for completeness but not part of the decision above: `assign_deprecated_ratings`'s `cutoff_week` argument was off by one week, which would have forced an entire week to always-null against evidence the real data had a genuine chance of populating it. Re-verified after the fix.*
