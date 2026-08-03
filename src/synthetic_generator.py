@@ -418,16 +418,23 @@ def generate_s03_observations(
 
 
 def combine_schedules(
-    seed: int,
+    rng: np.random.Generator,
     n_random_off_weeks: int=2,
 ) -> list[dict]:
-  
-  rng = _generate_rng(seed)
 
   combined_schedule = []
 
-  academic_schedule = generate_academic_schedule(START, END, rng, n_random_off_weeks)
-  jj_schedule = generate_jiu_jitsu_observations(START, END, rng)
+  academic_schedule = generate_academic_schedule(
+    START, 
+    END, 
+    rng, 
+    n_random_off_weeks
+  )
+  jj_schedule = generate_jiu_jitsu_observations(
+    START, 
+    END, 
+    rng
+  )
 
   academic_week_endings = {
     week["week_ending"]
@@ -640,7 +647,6 @@ def assign_core_ratings(
     }
 
   for row in session_rows:
-
     new_row = row.copy()
 
     student_id = new_row["student_id"]
@@ -658,6 +664,131 @@ def assign_core_ratings(
     finalized_rows.append(new_row)
 
   return finalized_rows
+
+
+def assign_secondary_ratings(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  null_rates = {
+    "Enrichment": {
+      "Problem-Solving or Cognitive Flexibility": 0.15,
+      "Resilience": 0.1,
+      "Frustration Tolerance": 0.13,
+      "Abstract Thinking and Pattern Recognition": 0.23,
+      "Impulse Modulation": 0.28,
+    },
+    "Jiu-Jitsu": {
+      "Problem-Solving or Cognitive Flexibility": 0.15,
+      "Resilience": 0.11,
+      "Frustration Tolerance": 0.27,
+      "Abstract Thinking and Pattern Recognition": 0.5,
+      "Impulse Modulation": 0.55,
+    },
+  }
+
+  pooled_value_distribution = {
+    "Problem-Solving or Cognitive Flexibility": {
+      "ratings": [1, 2, 3, 4, 5],
+      "weights": np.array([14, 12, 62, 26, 17])/131,
+    },
+    "Resilience": {
+      "ratings": [1, 2, 3, 4, 5],
+      "weights": np.array([13, 10, 64, 27, 25])/139,
+    },
+    "Frustration Tolerance": {
+      "ratings": [1, 2, 3, 4, 5],
+      "weights": np.array([18, 9, 51, 33, 20])/131,
+    },
+    "Abstract Thinking and Pattern Recognition": {
+      "ratings": [1, 2, 3, 4, 5],
+      "weights": np.array([5, 19, 38, 31, 20])/113,
+    },
+    "Impulse Modulation": {
+      "ratings": [1, 2, 3, 4, 5],
+      "weights": np.array([13, 15, 34, 20, 23])/105,
+    },
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    context = new_row["session_category"]
+    context_null_rates = null_rates[context]
+
+    for domain, null_rate in context_null_rates.items():
+
+      is_null = rng.choice(
+        [True, False],
+        p=[null_rate, 1 - null_rate],
+      )
+
+      if is_null:
+        new_row[domain] = None
+      else:
+        distribution = pooled_value_distribution[domain]
+
+        new_row[domain] = int(
+          rng.choice(
+            distribution["ratings"],
+            p=distribution["weights"],
+          )
+        )
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_deprecated_ratings(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  null_rates = {
+    "Coordination and Motor Skills": 0.296,
+    "Social Regulation": 0.042,
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+    current_date = new_row["true_week_ending"]
+
+    if current_date <= cutoff_week:
+      for domain in null_rates:
+        null_rate = null_rates[domain]
+
+        is_null = rng.choice(
+          [True, False],
+          p=[null_rate, 1 - null_rate],
+        )
+
+        if is_null:
+          new_row[domain] = None
+        else:
+          new_row[domain] = int(
+            rng.choice(
+              [1, 2, 3, 4, 5],
+              p=np.array([20, 20, 20, 20, 20])/100
+            )
+          )
+
+    else:
+      for domain in null_rates:
+        new_row[domain] = None
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+
 
 
 def inject_timestamp_skew(
@@ -707,43 +838,4 @@ def inject_timestamp_skew(
     key=lambda row: row["timestamp"]
   )
 
-import pandas as pd
 
-seed = 42
-rng = _generate_rng(seed)
-
-rows = derive_session_rows(
-    combine_schedules(seed, 2)
-)
-
-rows = assign_observer_id(
-    rows,
-    date(2025, 12, 7),
-)
-
-rows = assign_observation_context(
-    rows,
-    rng,
-)
-
-rows = assign_core_ratings(
-    rows,
-    rng,
-)
-
-df = pd.DataFrame(rows)
-
-print(
-    df[
-        [
-            "timestamp",
-            "student_id",
-            "session_category",
-            "observation_context",
-            "observer_id",
-            "Focus or Attention",
-            "Carryover or Retention",
-            "Confidence, Autonomy, or Initiative",
-        ]
-    ].head(15)
-)
