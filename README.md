@@ -76,7 +76,7 @@ kuzushi/
 ├── data_schema/             # Planned derived data schema, codebook, and sample anonymized structures
 ├── notebooks/               # Future exploratory analysis notebooks
 ├── tests/                   # Automated tests for pipeline behavior
-├── scripts/                   # Development utilities for inspection and debugging
+├── scripts/                 # Development utilities for inspection and debugging
 └── src/                     # Python source code for data structuring and analysis
 
 ```
