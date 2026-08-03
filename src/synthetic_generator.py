@@ -788,9 +788,6 @@ def assign_deprecated_ratings(
   return finalized_rows
 
 
-
-
-
 def inject_timestamp_skew(
     session_rows: list[dict],
     synthesis_log_rows: list[dict],
