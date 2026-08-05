@@ -143,3 +143,76 @@ Option 2.
 - The lesson here is sharper than "run the code, don't just read it" (Milestones 1 and 2's theme): every individual function was already correct in isolation — unit-level testing of `combine_schedules` alone would never have surfaced this, because the defect only exists in how functions compose together. Only a genuine integration test (here, a plain inspection script rather than a formal one) could catch it. A system where every component follows a convention except the one composing them is a specific, findable smell — and it's specifically invisible to testing components one at a time.
 
 *A separate, unrelated fix landed in the same pass, worth noting for completeness but not part of the decision above: `assign_deprecated_ratings`'s `cutoff_week` argument was off by one week, which would have forced an entire week to always-null against evidence the real data had a genuine chance of populating it. Re-verified after the fix.*
+
+---
+
+## Milestone 5 — Splitting `timestamp` into ground truth and apparent value, before skew existed
+
+*Internal cross-reference: blueprint §12, Entry 26. First instance of the anchor-field idiom named in Milestone 7.*
+
+**Problem**
+
+`derive_session_rows`'s output has one timestamp field, and at that stage it's ground truth — but the very next step deliberately corrupts it for some rows to simulate retrospective entry. Once that happens, a row's apparent timestamp can no longer be trusted to indicate its true week.
+
+**Options considered**
+
+1. Keep a single `timestamp` field and let downstream code re-derive week membership from it as needed, after corruption has already happened.
+2. Carry `true_week_ending` alongside `timestamp` from the moment rows are created, explicitly named as privileged, generator-only ground truth that must never appear in the eventual CSV output.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 is the field shape a real Bronze/Silver pipeline actually has to work with — deliberately not what this intermediate generator representation should mimic, since the whole point of building skew is to have an answer key to check reconciliation logic against later. Option 2 preserves that answer key for free, at the moment it's cheapest to keep, rather than reconstructing "which week did this really belong to" after the only trustworthy signal has been intentionally destroyed for some rows.
+- This is the first instance of what later became a named, reused idiom in this project — see Milestone 7, where the same reasoning paid off a second and third time, including against a threat this entry never anticipated.
+
+---
+
+## Milestone 6 — Reordering the pipeline to derive → enrich → inject, with `session_category` as the stable discriminator
+
+*Internal cross-reference: blueprint §13, Entry 32.*
+
+**Problem**
+
+`observation_context` needed to become real category strings, but `inject_timestamp_skew` and the enrichment functions running after it needed a stable way to identify "this is an Enrichment row" regardless of what `observation_context` had since been rewritten to. The original build order — skew before any enrichment — had no actual technical justification; it was simply the order the functions happened to get built in.
+
+**Options considered**
+
+1. Keep the original order, requiring every future enrichment function to avoid touching or depending on anything skew already changed.
+2. Reorder into a genuine three-phase pipeline — derive truth, enrich truth, inject defect — introducing `session_category` as a field set once and never modified again, with every downstream function keying off it instead of the mutable `observation_context`.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 was checked and found to have no correctness dependency actually requiring it. Option 2 costs nothing to adopt and buys a strictly simpler mental model: skew becomes the true last step, the only function permitted to touch `timestamp` after everything else is already correct. `session_category` mirrors the exact reasoning behind Milestone 5's `true_week_ending` split.
+- Verified the switch was necessary, not cosmetic: re-running the full reordered pipeline confirmed the skew step still correctly matches the right rows after the discriminator field had already been overwritten — had it not been switched, skew would have silently matched zero rows.
+
+---
+
+## Milestone 7 — Anchor fields, and a granularity mismatch that took several passes to diagnose
+
+*Internal cross-reference: blueprint §13, Entry 37. Builds on Milestones 5 and 6, the two earlier anchor-field instances.*
+
+**Problem**
+
+A cutover comparison — checking a raw session date against a fixed reference date — worked, but the reason it worked was genuinely non-obvious and took several wrong turns to diagnose correctly. Cutoff values in this project are always constructed as week-ending values, which are always Sundays. The synthetic schedule's spring-semester sessions only ever fall on two specific non-Sunday weekdays. A weekday date can never satisfy "on or after this Sunday" within its own week — the earliest date that can is the following week's version of that same weekday. This silently pushed the effective transition one full week later than intended, with no error anywhere to reveal it. The value eventually found to "work" only did so because it happened to be reachable within its own week by the same meeting-day pattern — sidestepping the mismatch rather than resolving it.
+
+**Options considered**
+
+1. Leave the fix as a direct comparison against that specific weekday value, now confirmed to produce the desired result.
+2. Refactor to compare against the anchor field (`true_week_ending`) instead of the more granular raw value — verified, after correcting an earlier wrong equivalence, to produce identical output to option 1.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 works today, but its correctness depends on an unstated fact invisible at the call site — that the chosen value happens to be reachable within its own week by the specific meeting pattern in use — which would silently stop holding against a different meeting pattern or a differently-built cutoff. Option 2 costs nothing and states the actual intent directly, independent of which weekdays sessions happen to fall on.
+- General lesson: a week-level cutoff compared against day-level data is safe only when every day-level value is guaranteed to reach the cutoff within its own week — easy to lose silently when the cutoff and the data being compared are built from different conventions. When a fix works for a reason that takes several rounds of tracing to explain, that's itself a signal the implementation is more fragile than it looks, independent of whether today's value happens to be correct.
+- This is the third time this exact shape of decision has paid off (see Milestones 5 and 6, both defending against deliberate data corruption from other generator functions). This occurrence is the most interesting of the three precisely because it defended against nothing either earlier instance was built for — nothing here was corrupted; the raw field simply carried more resolution than the comparison needed. An anchor field's value isn't limited to the one threat it was built to defend against — it extends to an entire class of grain-mismatch fragilities, including ones nobody anticipated when it was first built.
