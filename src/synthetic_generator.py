@@ -572,18 +572,18 @@ def assign_observer_id(
 def assign_observation_context(
   session_rows: list[dict],
   rng: np.random.Generator,
+  cutoff_week: date,
 ) -> list[dict]:
 
   meeting_categories = {}
   finalized_rows = []
 
   categories = [
-    "Enrichment (Sibling Dyad)",
     "Enrichment: Group Session",
     "Enrichment: Group Activity",
   ]
 
-  probabilities = np.array([74, 43, 12]) / (74 + 43 + 12)
+  probabilities = np.array([43, 12]) / sum([43, 12])
 
   for row in session_rows:
     new_row = row.copy()
@@ -592,12 +592,16 @@ def assign_observation_context(
       session_key = new_row["timestamp"]
 
       if session_key not in meeting_categories:
-        meeting_categories[session_key] = str(
-          rng.choice(
-            categories,
-            p=probabilities,
+        if new_row["true_week_ending"] >= cutoff_week:
+          meeting_categories[session_key] = "Enrichment (Sibling Dyad)"
+
+        else:
+          meeting_categories[session_key] = str(
+            rng.choice(
+              categories,
+              p=probabilities,
+            )
           )
-        )
 
       new_row["observation_context"] = (
         meeting_categories[session_key]
@@ -618,30 +622,30 @@ def assign_core_ratings(
   student_weights = {
       "S01": {
         "Focus or Attention": {
-          "ratings": [1, 2, 3, 4, 5],
-          "weights": np.array([3, 7, 19, 27, 18])/74,
+          "ratings": np.arange(1, 6),
+          "weights": np.array([3, 7, 19, 27, 18])/sum([3, 7, 19, 27, 18]),
         },
         "Carryover or Retention": {
-          "ratings": [1, 2, 3, 4, 5],
-          "weights": np.array([1, 2, 26, 30, 15])/74,
+          "ratings": np.arange(1, 6),
+          "weights": np.array([1, 2, 26, 30, 15])/sum([1, 2, 26, 30, 15]),
         },
         "Confidence, Autonomy, or Initiative": {
-          "ratings": [1, 2, 3, 4, 5],
-          "weights": np.array([1, 4, 18, 27, 24])/74,
+          "ratings": np.arange(1, 6),
+          "weights": np.array([1, 4, 18, 27, 24])/sum([1, 4, 18, 27, 24]),
         }
       },
       "S02": {
         "Focus or Attention": {
-          "ratings": [1, 2, 3, 4, 5],
-          "weights": np.array([3, 10, 28, 25, 14])/80,
+          "ratings": np.arange(1, 6),
+          "weights": np.array([3, 10, 28, 25, 14])/sum([3, 10, 28, 25, 14]),
         },
         "Carryover or Retention": {
-          "ratings": [1, 2, 3, 4, 5],
-          "weights": np.array([0, 5, 32, 29, 14])/80,
+          "ratings": np.arange(1, 6),
+          "weights": np.array([0, 5, 32, 29, 14])/sum([0, 5, 32, 29, 14]),
         },
         "Confidence, Autonomy, or Initiative": {
-          "ratings": [1, 2, 3, 4, 5],
-          "weights": np.array([3, 6, 23, 25, 23])/80,
+          "ratings": np.arange(1, 6),
+          "weights": np.array([3, 6, 23, 25, 23])/sum([3, 6, 23, 25, 23]),
         }
       }
     }
@@ -692,24 +696,24 @@ def assign_secondary_ratings(
 
   pooled_value_distribution = {
     "Problem-Solving or Cognitive Flexibility": {
-      "ratings": [1, 2, 3, 4, 5],
-      "weights": np.array([14, 12, 62, 26, 17])/131,
+      "ratings": np.arange(1, 6),
+      "weights": np.array([14, 12, 62, 26, 17])/sum([14, 12, 62, 26, 17]),
     },
     "Resilience": {
-      "ratings": [1, 2, 3, 4, 5],
-      "weights": np.array([13, 10, 64, 27, 25])/139,
+      "ratings": np.arange(1, 6),
+      "weights": np.array([13, 10, 64, 27, 25])/sum([13, 10, 64, 27, 25]),
     },
     "Frustration Tolerance": {
-      "ratings": [1, 2, 3, 4, 5],
-      "weights": np.array([18, 9, 51, 33, 20])/131,
+      "ratings": np.arange(1, 6),
+      "weights": np.array([18, 9, 51, 33, 20])/sum([18, 9, 51, 33, 20]),
     },
     "Abstract Thinking and Pattern Recognition": {
-      "ratings": [1, 2, 3, 4, 5],
-      "weights": np.array([5, 19, 38, 31, 20])/113,
+      "ratings": np.arange(1, 6),
+      "weights": np.array([5, 19, 38, 31, 20])/sum([5, 19, 38, 31, 20]),
     },
     "Impulse Modulation": {
-      "ratings": [1, 2, 3, 4, 5],
-      "weights": np.array([13, 15, 34, 20, 23])/105,
+      "ratings": np.arange(1, 6),
+      "weights": np.array([13, 15, 34, 20, 23])/sum([13, 15, 34, 20, 23]),
     },
   }
 
@@ -760,7 +764,11 @@ def assign_deprecated_ratings(
     new_row = row.copy()
     current_date = new_row["true_week_ending"]
 
-    if current_date <= cutoff_week:
+    if current_date >= cutoff_week:
+      for domain in null_rates:
+        new_row[domain] = None
+
+    else:
       for domain in null_rates:
         null_rate = null_rates[domain]
 
@@ -774,14 +782,57 @@ def assign_deprecated_ratings(
         else:
           new_row[domain] = int(
             rng.choice(
-              [1, 2, 3, 4, 5],
-              p=np.array([20, 20, 20, 20, 20])/100
+              np.arange(1, 6),
+              p=np.array([20, 20, 20, 20, 20])/sum([20, 20, 20, 20, 20])
             )
           )
 
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_pages_completed(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if new_row["session_category"] == "Jiu-Jitsu":
+      new_row["Number of Pages Completed"] = None
+
     else:
-      for domain in null_rates:
-        new_row[domain] = None
+      if new_row["true_week_ending"] < cutoff_week:
+        new_row["Number of Pages Completed"] = None
+
+      else:
+        current_week = new_row["true_week_ending"]
+
+        progress = (
+          (current_week - cutoff_week).days / 
+          (END - cutoff_week).days
+        )
+
+        base_mean = 5.2 if new_row["student_id"] == "S01" else 6.5
+        final_mean = 6.0 if new_row["student_id"] == "S01" else 7.5
+
+        expected_pages = (
+          base_mean + 
+          progress * (final_mean - base_mean)
+        )
+
+        pages = int(round(
+          rng.normal(expected_pages, 3.0)
+        ))
+
+        pages = max(1, min(21, pages))
+
+        new_row["Number of Pages Completed"] = pages
 
     finalized_rows.append(new_row)
 
