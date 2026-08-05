@@ -216,3 +216,28 @@ Option 2.
 - Option 1 works today, but its correctness depends on an unstated fact invisible at the call site — that the chosen value happens to be reachable within its own week by the specific meeting pattern in use — which would silently stop holding against a different meeting pattern or a differently-built cutoff. Option 2 costs nothing and states the actual intent directly, independent of which weekdays sessions happen to fall on.
 - General lesson: a week-level cutoff compared against day-level data is safe only when every day-level value is guaranteed to reach the cutoff within its own week — easy to lose silently when the cutoff and the data being compared are built from different conventions. When a fix works for a reason that takes several rounds of tracing to explain, that's itself a signal the implementation is more fragile than it looks, independent of whether today's value happens to be correct.
 - This is the third time this exact shape of decision has paid off (see Milestones 5 and 6, both defending against deliberate data corruption from other generator functions). This occurrence is the most interesting of the three precisely because it defended against nothing either earlier instance was built for — nothing here was corrupted; the raw field simply carried more resolution than the comparison needed. An anchor field's value isn't limited to the one threat it was built to defend against — it extends to an entire class of grain-mismatch fragilities, including ones nobody anticipated when it was first built.
+
+---
+
+## Milestone 8 — Asymmetric, empirically-calibrated cadence per learner
+
+*Internal cross-reference: blueprint §11, Entry 19.*
+
+**Problem**
+
+An initial single shared cadence for both learners' Jiu-Jitsu observations produced a symmetric ~10/10 split, but the real session log shows a meaningfully asymmetric split between the two learners.
+
+**Options considered**
+
+1. Accept a symmetric model as a reasonable simplification.
+2. Give each learner independent cadence parameters, calibrated to approximate the real per-learner counts.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Calibration required checking distributions, not single runs — an early parameter choice that looked close on one seed turned out, across eight seeds, to average noticeably short of the real target, since a single favorable draw isn't the same evidence as a correct average. The final parameters were accepted once multi-seed testing showed both learners consistently landing near their real historical counts rather than matching by chance on one seed.
+- A deliberate stopping point was set here rather than continuing to tighten toward an exact historical match — the generator's job is to produce plausible, realistically asymmetric irregularity, not to reproduce one specific year's exact totals, and further precision past this point would cost real effort for no benefit to the generator's actual purpose.
+- This is the earliest instance in the project of a recurring calibration discipline: distrust a single seed's apparent success, and set an explicit, principled stopping point for "close enough" rather than let calibration effort expand without bound.

@@ -342,27 +342,59 @@ def test_assign_core_ratings_preserves_existing_columns():
 
 def test_observation_context_boundary_week_is_fully_new():
   rng = sg._generate_rng(42)
-  rows = sg.derive_session_rows(sg.combine_schedules(rng, 2))
-  rows = sg.assign_observation_context(rows, rng, date(2026, 1, 25))
+
+  rows = sg.derive_session_rows(
+    sg.combine_schedules(rng, 2)
+    )
+  
+  rows = sg.assign_observation_context(
+    rows, 
+    rng, 
+    date(2026, 1, 25)
+    )
+
   boundary = [r for r in rows if r["true_week_ending"] == date(2026, 1, 25) and r["session_category"] == "Enrichment"]
+
   assert boundary
   assert all(r["observation_context"] == "Enrichment (Sibling Dyad)" for r in boundary)
 
 
 def test_deprecated_ratings_boundary_week_is_fully_null():
   rng = sg._generate_rng(42)
-  rows = sg.derive_session_rows(sg.combine_schedules(rng, 2))
-  rows = sg.assign_deprecated_ratings(rows, rng, date(2026, 1, 25))
+
+  rows = sg.derive_session_rows(
+    sg.combine_schedules(rng, 2)
+    )
+  
+  rows = sg.assign_deprecated_ratings(
+    rows, 
+    rng, 
+    date(2026, 1, 25)
+    )
+
   boundary = [r for r in rows if r["true_week_ending"] == date(2026, 1, 25)]
+
   assert boundary
-  assert all(r["Coordination and Motor Skills"] is None and r["Social Regulation"] is None for r in boundary)
+  assert all(r["Coordination and Motor Skills"] is None 
+             and r["Social Regulation"] is None for r in boundary)
 
 
 def test_pages_completed_boundary_week_is_already_active():
   rng = sg._generate_rng(42)
-  rows = sg.derive_session_rows(sg.combine_schedules(rng, 2))
-  rows = sg.assign_pages_completed(rows, rng, date(2025, 12, 7))
-  boundary = [r for r in rows if r["true_week_ending"] == date(2025, 12, 7) and r["session_category"] == "Enrichment"]
+
+  rows = sg.derive_session_rows(
+    sg.combine_schedules(rng, 2)
+    )
+  
+  rows = sg.assign_pages_completed(
+    rows, 
+    rng, 
+    date(2025, 12, 7)
+    )
+
+  boundary = [r for r in rows if r["true_week_ending"] == date(2025, 12, 7) 
+              and r["session_category"] == "Enrichment"]
+
   assert boundary
   assert any(r["Number of Pages Completed"] is not None for r in boundary)
 
@@ -375,12 +407,9 @@ def test_pages_completed_boundary_week_is_already_active():
 def test_timestamp_skew_does_not_mutate_original_rows():
   rng = sg._generate_rng(42)
 
-  session_rows = sg.derive_session_rows(
-    sg.combine_schedules(rng, 2)
-  )
-  original_rows = deepcopy(session_rows)
-
   combined_schedule = sg.combine_schedules(rng, 2)
+  session_rows = sg.derive_session_rows(combined_schedule)
+  original_rows = deepcopy(session_rows)
 
   sg.inject_timestamp_skew(
     session_rows,
@@ -395,11 +424,8 @@ def test_timestamp_skew_does_not_mutate_original_rows():
 def test_returned_schedule_has_the_same_number_of_rows():
   rng = sg._generate_rng(42)
 
-  session_rows = sg.derive_session_rows(
-    sg.combine_schedules(rng, 2)
-  )
-
   combined_schedule = sg.combine_schedules(rng, 2)
+  session_rows = sg.derive_session_rows(combined_schedule)
 
   skewed_schedule = sg.inject_timestamp_skew(
     session_rows,

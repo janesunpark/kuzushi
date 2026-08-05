@@ -46,7 +46,7 @@ Detailed privacy and anonymization practices are described in [Data Ethics & Ano
 
 ## Current Status
 
-This repository is in an active development phase. It currently contains project framing, research methodology, observation documentation, and the initial implementation of a medallion-layer data pipeline for a reproducible data management. 
+This repository is in an active development phase. It currently contains project framing, research methodology, observation documentation, and the initial implementation of a medallion-layer pipeline for a reproducible data management. 
 
 The 2025–2026 academic year observation cycle has been completed privately. The current development focuses on transforming those observational records into structured analytical datasets while preserving the original source data. Future work includes completing the Silver and Gold layers of the pipeline, generating synthetic or anonymized datasets for demonstration, and developing exploratory analyses and visualizations to investigate longitudinal learning patterns.
 
@@ -110,7 +110,7 @@ Any future modeling will be used cautiously and descriptively, with a focus on p
 
 ## About the Author
 
-This project was developed by an educator transitioning into data science and machine learning, with experience in one-to-one and small-group academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
+This project was developed by an educator transitioning into data science and software engineering, with experience in one-to-one and small-group academic enrichment, early math instruction, and Brazilian Jiu Jitsu. 
 
 Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the training community that helped her see problem-solving, adaptation, and resilience in a more embodied way. The author is grateful to her coaches, teammates, and students for being part of the learning environments that made this project possible. 
 
