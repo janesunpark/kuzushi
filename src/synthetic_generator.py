@@ -839,6 +839,135 @@ def assign_pages_completed(
   return finalized_rows
 
 
+def assign_task_difficulty(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  distribution = {
+    "S01": {
+      "ratings": np.arange(1, 6),
+      "weights": np.array([5, 11, 10, 6, 5])/sum([5, 11, 10, 6, 5]),
+    },
+    "S02": {
+      "ratings": np.arange(1, 6),
+      "weights": np.array([2, 8, 18, 4, 5])/sum([2, 8, 18, 4, 5]),
+    },
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    new_row["Task Difficulty or Novelty"] = None
+
+    if new_row["true_week_ending"] >= cutoff_week:
+      student = new_row["student_id"]
+
+      new_row["Task Difficulty or Novelty"] = int(
+        rng.choice(
+          distribution[student]["ratings"],
+          p=distribution[student]["weights"]
+        )
+      ) 
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_duration(
+    session_rows:list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+    phase_shift_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  early_duration_distribution = {
+    45 : 2,
+    60 : 4,
+    75 : 4,
+    80 : 10,
+    90 : 2, 
+    120: 8,
+  }
+
+  late_duration_distribution = {
+    60 : 18,
+    80 : 38,
+    90 : 4,
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if new_row["true_week_ending"] < cutoff_week:
+      new_row["Duration in Minutes"] = None
+
+    elif new_row["session_category"] == "Jiu-Jitsu":
+      new_row["Duration in Minutes"] = 45
+
+    else: 
+      if new_row["true_week_ending"] >= phase_shift_week:
+        distribution = late_duration_distribution
+
+      else:
+        distribution = early_duration_distribution
+
+      minutes = list(distribution.keys())
+      weights = np.array(list(distribution.values()))
+      weights = weights / weights.sum()
+
+      new_row["Duration in Minutes"] = int(
+        rng.choice(minutes, p=weights)
+      )
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_primary_task_type(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  task_distribution = {
+    "Mixed" : 20,
+    "Worksheet" : 14,
+    "Puzzle" : 1,
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    new_row["Primary Task Type"] = None
+
+    if (
+      new_row["true_week_ending"] >= cutoff_week
+      and new_row["session_category"] == "Enrichment"
+    ):
+      tasks = list(task_distribution.keys())
+      weights = np.array(list(task_distribution.values()))
+      weights = weights / weights.sum()
+
+      new_row["Primary Task Type"] = str(rng.choice(
+        tasks,
+        p=weights
+      ))
+  
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
 def inject_timestamp_skew(
     session_rows: list[dict],
     synthesis_log_rows: list[dict],

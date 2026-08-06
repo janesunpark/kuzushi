@@ -76,7 +76,7 @@ def test_assign_observer_id_does_not_mutate_input():
 
   sg.assign_observer_id(
     session_rows,
-    date(2025, 12, 7)
+    date(2025, 12, 14)
   )
 
   assert session_rows == original_rows
@@ -89,7 +89,7 @@ def test_observer_id_shifts_at_transition_week():
     sg.combine_schedules(rng, 2)
   )
 
-  transition_week = date(2025, 12, 7)
+  transition_week = date(2025, 12, 14)
 
   rows1 = sg.assign_observer_id(session_rows, transition_week)
 
