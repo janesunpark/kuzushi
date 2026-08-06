@@ -28,8 +28,8 @@ def main():
               row["observation_context"],
           )
 
-  rows = sg.assign_observer_id(rows, date(2025, 12, 7))
-  transition = date(2025, 12, 7)
+  rows = sg.assign_observer_id(rows, date(2025, 12, 14))
+  transition = date(2025, 12, 14)
 
   print("\nRows around observer transition:")
   for row in rows:
@@ -91,6 +91,62 @@ def main():
             row["student_id"],
             row["Number of Pages Completed"],
         )
+
+  rows = sg.assign_task_difficulty(rows, rng, date(2026, 1, 25))
+  transition = date(2026, 1, 25)
+  
+  print("\nRows around task difficulty ratings:")
+  for row in rows:
+      if abs((row["true_week_ending"] - transition).days) <= 7:
+          print(
+              row["true_week_ending"],
+              row["session_category"],
+              row["Task Difficulty or Novelty"],
+          )
+  
+  print(rows[:3])
+
+  rows = sg.assign_duration(rows, rng, date(2025, 12, 14), date(2026, 2, 15))
+  cutoff_week = date(2025, 12, 14)
+  
+  print("\nRows around when duration gets logged:")
+  for row in rows:
+      if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+          print(
+              row["true_week_ending"],
+              row["session_category"],
+              row["Duration in Minutes"],
+          )
+  
+  print(rows[:3])
+
+  transition = date(2026, 2, 15)
+  
+  print("\nRows around when duration changes:")
+  for row in rows:
+      if abs((row["true_week_ending"] - transition).days) <= 7:
+          print(
+              row["true_week_ending"],
+              row["session_category"],
+              row["Duration in Minutes"],
+          )
+  
+  print(rows[:3])
+
+
+  rows = sg.assign_primary_task_type(rows, rng, date(2026, 4, 5))
+  transition = date(2026, 4, 5)
+  
+  print("\nRows around when task types are recorded:")
+  for row in rows:
+      if abs((row["true_week_ending"] - transition).days) <= 7:
+          print(
+              row["true_week_ending"],
+              row["session_category"],
+              row["Primary Task Type"],
+          )
+  
+  print(rows[:3])
 
 
 if __name__ == "__main__":
