@@ -119,3 +119,6 @@ Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the tra
 This repository is shared for documentation, portfolio, and academic review purposes only. Public-facing materials may be read and referenced with appropriate attribution, but the observational framework, research notes, and project structure should not be reused, redistributed, or adapted as child-level assessment materials without permission.
 
 Raw observation logs, private data, videos, photos, and identifying details are not included in this repository and are not available for public use. 
+
+Copyright © 2026 Jane Park
+Kuzushi
