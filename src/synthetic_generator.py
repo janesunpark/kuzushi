@@ -2,20 +2,16 @@ from datetime import date, datetime, time, timedelta
 
 import numpy as np
 
-
 # =================================================================================
 # Configuration
 # =================================================================================
 
-
 START = date(2025, 8, 17)
 END = date(2026, 6, 14)
-
 
 # =================================================================================
 # Shared helper functions
 # =================================================================================
-
 
 def _generate_rng(seed: int) -> np.random.Generator:
 
@@ -80,10 +76,34 @@ def _generate_break_periods(
   return break_periods
 
 
+def _find_phase(phases, true_week_ending):
+  selected_weights = None
+
+  for start_date, weights in phases:
+    if start_date <= true_week_ending:
+      selected_weights = weights
+    else:
+      break
+
+  return selected_weights
+
+
+def _level_of(item_name):
+  return item_name.split()[-2]
+
+
+def _level_weights(weights):
+  level_totals = {}
+
+  for item, count in weights.items():
+    level = _level_of(item)
+    level_totals[level] = level_totals.get(level, 0) + count
+
+  return level_totals
+
 # =================================================================================
 # Schedule generators
 # =================================================================================
-
 
 def generate_academic_schedule(
     start: date,
@@ -411,11 +431,9 @@ def generate_s03_observations(
     key=lambda observation: observation["observed_at"],
   )
 
-
 # =================================================================================
 # Schedule orchestration
 # =================================================================================
-
 
 def combine_schedules(
     rng: np.random.Generator,
@@ -620,35 +638,36 @@ def assign_core_ratings(
   finalized_rows = []
 
   student_weights = {
-      "S01": {
-        "Focus or Attention": {
-          "ratings": np.arange(1, 6),
-          "weights": np.array([7, 8, 29, 35, 21]) / 100,
-        },
-        "Carryover or Retention": {
-          "ratings": np.arange(1, 6),
-          "weights": np.array([3, 6, 34, 39, 18]) / 100,
-        },
-        "Confidence, Autonomy, or Initiative": {
-          "ratings": np.arange(1, 6),
-          "weights": np.array([3, 9, 23, 34, 31]) / 100,
-        }
+    "S01": {
+      "Focus or Attention": {
+        "ratings": np.arange(1, 6),
+        "weights": np.array([7, 8, 29, 35, 21]) / 100,
       },
-      "S02": {
-        "Focus or Attention": {
-          "ratings": np.arange(1, 6),
-          "weights": np.array([6, 16, 31, 28, 19]) / 100,
-        },
-        "Carryover or Retention": {
-          "ratings": np.arange(1, 6),
-          "weights": np.array([0, 5, 43, 33, 19]) / 100,
-        },
-        "Confidence, Autonomy, or Initiative": {
-          "ratings": np.arange(1, 6),
-          "weights": np.array([6, 9, 26, 33, 26]) / 100,
-        }
-      }
-    }
+      "Carryover or Retention": {
+        "ratings": np.arange(1, 6),
+        "weights": np.array([3, 6, 34, 39, 18]) / 100,
+      },
+      "Confidence, Autonomy, or Initiative": {
+        "ratings": np.arange(1, 6),
+        "weights": np.array([3, 9, 23, 34, 31]) / 100,
+      },
+    },
+
+    "S02": {
+      "Focus or Attention": {
+        "ratings": np.arange(1, 6),
+        "weights": np.array([6, 16, 31, 28, 19]) / 100,
+      },
+      "Carryover or Retention": {
+        "ratings": np.arange(1, 6),
+        "weights": np.array([0, 5, 43, 33, 19]) / 100,
+      },
+      "Confidence, Autonomy, or Initiative": {
+        "ratings": np.arange(1, 6),
+        "weights": np.array([6, 9, 26, 33, 26]) / 100,
+      },
+    },
+  }
 
   for row in session_rows:
     new_row = row.copy()
@@ -967,6 +986,94 @@ def assign_primary_task_type(
 
   return finalized_rows
 
+
+def assign_published_materials_used(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  s01_phases = [
+    (date(2025, 12, 14), {"MathQuest KA Workbook": 49, "MathQuest KA Textbook": 41, "MathQuest PKA Workbook": 10}),
+    (date(2026, 2, 8),  {"MathQuest KB Workbook": 27, "MathQuest KA Textbook": 26, "MathQuest KA Workbook": 21, "MathQuest KB Textbook": 26}),
+    (date(2026, 2, 22),   {"MathQuest PKB Workbook": 41, "MathQuest PKB Textbook": 38, "MathQuest KB Workbook": 16, "MathQuest KB Textbook": 5}),
+    (date(2026, 5, 24),   {"MathQuest KA Textbook": 59, "MathQuest KA Workbook": 41}),
+  ]
+
+  s02_phases = [
+      (date(2025, 12, 14), {"MathQuest KA Workbook": 47, "MathQuest KA Textbook": 53}),
+      (date(2026, 1, 25),  {"MathQuest KB Textbook": 51, "MathQuest KA Workbook": 49}),
+      (date(2026, 2, 8),   {"MathQuest KB Workbook": 51, "MathQuest KB Textbook": 49}),
+      (date(2026, 5, 31),   {"MathQuest KB Textbook": 63, "MathQuest 1A Textbook": 37}),
+    ]
+
+  level_phases = {
+    "S01": s01_phases,
+    "S02": s02_phases,
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if (
+      new_row["true_week_ending"] < cutoff_week
+      or new_row["session_category"] != "Enrichment"
+    ):
+      new_row["Published Materials Used"] = None
+
+    else:
+      weights = _find_phase(
+        level_phases[new_row["student_id"]], 
+        new_row["true_week_ending"]
+      )
+
+      items = list(weights.keys())
+      probs = np.array(list(weights.values()))
+      probs = probs / probs.sum()
+
+      item_count = int(
+        rng.choice(
+          [1, 2], 
+          p=[0.76, 0.24]
+          )
+        )
+
+      if item_count == 1:
+        value = [str(rng.choice(items, p=probs))]
+
+      elif rng.random() < 0.86:
+          level_weights = _level_weights(weights)
+          levels = list(level_weights.keys())
+          level_probs = np.array(list(level_weights.values()))
+          level_probs = level_probs / level_probs.sum()
+
+          level = str(
+            rng.choice(
+              levels, 
+              p=level_probs
+              )
+            )
+
+          value = [f"MathQuest {level} Textbook", f"MathQuest {level} Workbook"]
+
+      else:
+        value = [str(v) for v in rng.choice(
+          items, 
+          size=2, 
+          replace=False, 
+          p=probs
+          )
+        ] 
+
+      new_row["Published Materials Used"] = ", ".join(value)
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+    
 
 def inject_timestamp_skew(
     session_rows: list[dict],
