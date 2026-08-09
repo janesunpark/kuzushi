@@ -1,6 +1,7 @@
+from datetime import date
+
 from src import synthetic_generator as sg
 
-from datetime import date
 
 def main():
 
@@ -12,141 +13,266 @@ def main():
   print("\nPipeline inspection")
 
   rows = sg.derive_session_rows(schedule)
+
   print("\nRows:", len(rows))
   print("\nAfter derive_session_rows")
   for row in rows[:3]:
-     print(row)
+    print(row)
 
-  rows = sg.assign_observation_context(rows, rng, date(2026, 1, 25))
-  transition = date(2026, 1, 25)
+  # =============================================================================
+  # Observation context
+  # =============================================================================
+
+  cutoff_week = date(2026, 1, 25)
+
+  rows = sg.assign_observation_context(
+    rows, 
+    rng, 
+    cutoff_week,
+  )
 
   print("\nRows around observation context:")
-  for row in rows:
-      if abs((row["true_week_ending"] - transition).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["observation_context"],
-          )
 
-  rows = sg.assign_observer_id(rows, date(2025, 12, 14))
-  transition = date(2025, 12, 14)
+  for row in rows:
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["observation_context"],
+      )
+
+  # =============================================================================
+  # Observer ID
+  # =============================================================================
+
+  transition_week = date(2025, 12, 14)
+
+  rows = sg.assign_observer_id(
+    rows, 
+    transition_week,
+  )
 
   print("\nRows around observer transition:")
-  for row in rows:
-      if abs((row["true_week_ending"] - transition).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["student_id"],
-              row["observer_id"],
-          )
 
-  rows = sg.assign_core_ratings(rows, rng)
+  for row in rows:
+    if abs((row["true_week_ending"] - transition_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["student_id"],
+        row["observer_id"],
+      )
+
+  # =============================================================================
+  # Core ratings
+  # =============================================================================
+
+  rows = sg.assign_core_ratings(
+    rows, 
+    rng,
+  )
+
   print("\nAfter core ratings")
-  for row in rows[:3]:
-     print(row)
 
-  rows = sg.assign_secondary_ratings(rows, rng)
+  for row in rows[:3]:
+    print(row)
+
+  # =============================================================================
+  # Secondary ratings
+  # =============================================================================
+
+  rows = sg.assign_secondary_ratings(
+    rows, 
+    rng,
+  )
+
   print("\nAfter secondary ratings")
+
   for row in rows[:3]:
-     print(row)
+    print(row)
 
-  rows = sg.assign_deprecated_ratings(rows, rng, date(2026, 1, 25))
-  transition = date(2026, 1, 25)
-  
+  # =============================================================================
+  # Deprecated ratings
+  # =============================================================================
+
+  cutoff_week = date(2026, 1, 25)
+
+  rows = sg.assign_deprecated_ratings(
+    rows, 
+    rng, 
+    cutoff_week,
+  )
+
   print("\nRows around deprecated ratings:")
+
   for row in rows:
-      if abs((row["true_week_ending"] - transition).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["Coordination and Motor Skills"],
-              row["Social Regulation"],
-          )
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["Coordination and Motor Skills"],
+        row["Social Regulation"],
+      )
 
-  print(rows[:3])
+  print("\nFirst three rows after deprecated ratings:")
 
+  for row in rows[:3]:
+    print(row)
 
-  rows = sg.assign_pages_completed(rows, rng, date(2025, 12, 7))
-  transition = date(2025, 12, 7)
+  # =============================================================================
+  # Pages completed
+  # =============================================================================
+
+  cutoff_week = date(2025, 12, 7)
+
+  rows = sg.assign_pages_completed(
+    rows,
+    rng,
+    cutoff_week,
+  )
 
   print("\nEarly-season pages:")
+
   for row in rows:
     if (
-        row["session_category"] == "Enrichment"
-        and row["true_week_ending"] <= date(2025, 9, 21)
+      row["session_category"] == "Enrichment"
+      and row["true_week_ending"] <= date(2025, 9, 21)
     ):
-        print(
-            row["true_week_ending"],
-            row["student_id"],
-            row["Number of Pages Completed"],
-        )
+      print(
+        row["true_week_ending"],
+        row["student_id"],
+        row["Number of Pages Completed"],
+      )
   
   print("\nLate-season pages:")
+
   for row in rows:
     if (
-        row["session_category"] == "Enrichment"
-        and row["true_week_ending"] >= date(2026, 5, 17)
+      row["session_category"] == "Enrichment"
+      and row["true_week_ending"] >= date(2026, 5, 17)
     ):
-        print(
-            row["true_week_ending"],
-            row["student_id"],
-            row["Number of Pages Completed"],
-        )
+      print(
+        row["true_week_ending"],
+        row["student_id"],
+        row["Number of Pages Completed"],
+      )
 
-  rows = sg.assign_task_difficulty(rows, rng, date(2026, 1, 25))
-  transition = date(2026, 1, 25)
+  # =============================================================================
+  # Task difficulty
+  # =============================================================================
+
+  cutoff_week = date(2026, 1, 25)
+
+  rows = sg.assign_task_difficulty(
+    rows,
+    rng,
+    cutoff_week,
+  )
   
   print("\nRows around task difficulty ratings:")
-  for row in rows:
-      if abs((row["true_week_ending"] - transition).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["session_category"],
-              row["Task Difficulty or Novelty"],
-          )
-  
-  print(rows[:3])
 
-  rows = sg.assign_duration(rows, rng, date(2025, 12, 14), date(2026, 2, 15))
+  for row in rows:
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["session_category"],
+        row["Task Difficulty or Novelty"],
+      )
+
+  print("\nFirst three rows after task difficulty:")
+
+  for row in rows[:3]:
+    print(row)
+
+  # =============================================================================
+  # Duration
+  # =============================================================================
+
   cutoff_week = date(2025, 12, 14)
-  
+  phase_shift_week = date(2026, 2, 15)
+
+  rows = sg.assign_duration(
+    rows,
+    rng,
+    cutoff_week,
+    phase_shift_week,
+  )
+
   print("\nRows around when duration gets logged:")
-  for row in rows:
-      if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["session_category"],
-              row["Duration in Minutes"],
-          )
-  
-  print(rows[:3])
 
-  transition = date(2026, 2, 15)
-  
+  for row in rows:
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["session_category"],
+        row["Duration in Minutes"],
+      )
+
+  print("\nFirst three rows after duration:")
+
+  for row in rows[:3]:
+    print(row)
+
   print("\nRows around when duration changes:")
+
   for row in rows:
-      if abs((row["true_week_ending"] - transition).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["session_category"],
-              row["Duration in Minutes"],
-          )
-  
-  print(rows[:3])
+    if abs((row["true_week_ending"] - phase_shift_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["session_category"],
+        row["Duration in Minutes"],
+      )
 
+  # =============================================================================
+  # Primary task type
+  # =============================================================================
 
-  rows = sg.assign_primary_task_type(rows, rng, date(2026, 4, 5))
-  transition = date(2026, 4, 5)
-  
+  cutoff_week = date(2026, 4, 5)
+
+  rows = sg.assign_primary_task_type(
+    rows,
+    rng,
+    cutoff_week,
+  )
+
   print("\nRows around when task types are recorded:")
+
   for row in rows:
-      if abs((row["true_week_ending"] - transition).days) <= 7:
-          print(
-              row["true_week_ending"],
-              row["session_category"],
-              row["Primary Task Type"],
-          )
-  
-  print(rows[:3])
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["session_category"],
+        row["Primary Task Type"],
+      )
+
+  print("\nFirst three rows after primary task types:")
+
+  for row in rows[:3]:
+    print(row)
+
+  # =============================================================================
+  # Published materials
+  # =============================================================================
+
+  cutoff_week = date(2025, 12, 14)
+
+  rows = sg.assign_published_materials_used(
+    rows,
+    rng,
+    cutoff_week,
+  )
+
+  print("\nRows around when books are recorded:")
+
+  for row in rows:
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["student_id"],
+        row["Published Materials Used"],
+      )
+
+  print("\nFirst three rows after published materials:")
+
+  for row in rows[:3]:
+    print(row)
 
 
 if __name__ == "__main__":
