@@ -5,7 +5,7 @@ from src import synthetic_generator as sg
 
 def main():
 
-  seed = 42
+  seed = 44
   rng = sg._generate_rng(seed)
 
   schedule = sg.combine_schedules(rng, 2)
@@ -273,6 +273,34 @@ def main():
 
   for row in rows[:3]:
     print(row)
+
+  # =============================================================================
+  # Puzzle types
+  # =============================================================================
+
+  cutoff_week = date(2026, 3, 22)
+  primary_task_type_cutoff_week = date(2026, 4, 5)
+
+  rows = sg.assign_puzzle_type(
+    rows,
+    rng,
+    cutoff_week,
+    primary_task_type_cutoff_week,
+  )
+
+  print("\nRows around when puzzle types are recorded:")
+
+  for row in rows:
+    if (
+      row["session_category"] == "Enrichment"
+      and date(2026, 3, 15) <= row["true_week_ending"] <= date(2026, 4, 19)
+    ):
+      print(
+        row["true_week_ending"],
+        row["student_id"],
+        row["Primary Task Type"],
+        row["Puzzle Type"],
+      )
 
 
 if __name__ == "__main__":
