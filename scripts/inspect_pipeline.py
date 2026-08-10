@@ -5,7 +5,7 @@ from src import synthetic_generator as sg
 
 def main():
 
-  seed = 44
+  seed = 42
   rng = sg._generate_rng(seed)
 
   schedule = sg.combine_schedules(rng, 2)
