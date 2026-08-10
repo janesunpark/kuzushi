@@ -1003,11 +1003,11 @@ def assign_published_materials_used(
   ]
 
   s02_phases = [
-      (date(2025, 12, 14), {"MathQuest KA Workbook": 3, "MathQuest KA Textbook": 3}),
-      (date(2026, 1, 11),  {"MathQuest KB Textbook": 1, "MathQuest KA Workbook": 1}),
-      (date(2026, 1, 18),   {"MathQuest KB Workbook": 25, "MathQuest KB Textbook": 21}),
-      (date(2026, 6, 7),   {"MathQuest KB Textbook": 2, "MathQuest 1A Textbook": 1}),
-    ]
+    (date(2025, 12, 14), {"MathQuest KA Workbook": 3, "MathQuest KA Textbook": 3}),
+    (date(2026, 1, 11),  {"MathQuest KB Textbook": 1, "MathQuest KA Workbook": 1}),
+    (date(2026, 1, 18),   {"MathQuest KB Workbook": 25, "MathQuest KB Textbook": 21}),
+    (date(2026, 6, 7),   {"MathQuest KB Textbook": 2, "MathQuest 1A Textbook": 1}),
+  ]
 
   level_phases = {
     "S01": s01_phases,
@@ -1059,11 +1059,13 @@ def assign_published_materials_used(
           value = [f"MathQuest {level} Textbook", f"MathQuest {level} Workbook"]
 
       else:
-        value = [str(v) for v in rng.choice(
-          items, 
-          size=2, 
-          replace=False, 
-          p=probs
+        value = [
+          str(v) 
+          for v in rng.choice(
+            items, 
+            size=2, 
+            replace=False, 
+            p=probs
           )
         ] 
 
@@ -1073,7 +1075,112 @@ def assign_published_materials_used(
 
   return finalized_rows
 
-    
+
+def assign_puzzle_type(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+    primary_task_type_cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  item_distribution = {
+    "S01": {
+      "items": np.array([
+        "CubePix",
+        "GeoCrystals",
+        "Tetromino Square",
+        "Geoboard",
+        "Pattern Blocks",
+      ]),
+      "weights": np.array([7, 5, 3, 2, 1]),
+    },
+    "S02": {
+      "items": np.array([
+        "CubePix",
+        "GeoCrystals",
+        "Tetromino Square",
+        "Geoboard",
+        "Pattern Blocks",
+      ]),
+      "weights": np.array([10, 5, 5, 3, 1]),
+    },
+  }
+
+  null_rates = {
+    "Worksheet": 0.75,
+    "Mixed": 0.0,
+    "Puzzle": 0.0,
+  }
+
+  item_counts = {
+    "Mixed": {
+      "counts": np.array([1, 2, 3]),
+      "weights": np.array([8, 12, 1]),
+    },
+    "Puzzle": {
+      "counts": np.array([1, 2, 3]),
+      "weights": np.array([8, 12, 1]),
+    },
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+    new_row["Puzzle Type"] = None
+
+    if (
+      new_row["true_week_ending"] >= cutoff_week
+      and new_row["session_category"] == "Enrichment"
+    ):
+
+      if new_row["true_week_ending"] < primary_task_type_cutoff_week:
+        student_id = new_row["student_id"]
+        puzzles = item_distribution[student_id]["items"]
+        weights = item_distribution[student_id]["weights"]
+        weights = weights / weights.sum()
+
+        if new_row["true_week_ending"] < primary_task_type_cutoff_week:
+
+          if rng.random() >= 0.5:
+            new_row["Puzzle Type"] = str(rng.choice(puzzles, p=weights))
+
+      else:
+        task_type = new_row['Primary Task Type']
+
+        if rng.random() >= null_rates[task_type]:
+          if task_type == "Worksheet":
+            item_count = 1
+
+          else:
+            counts = item_counts[task_type]["counts"]
+
+            probs = item_counts[task_type]["weights"]
+            probs = probs / probs.sum()
+
+            item_count = int(
+              rng.choice(
+                counts,
+                p=probs,
+              )
+            )
+
+          selected_puzzles = [
+            str(v) 
+            for v in rng.choice(
+              puzzles,
+              size=item_count,
+              replace=False,
+              p=weights,
+            )
+          ]
+
+          new_row["Puzzle Type"] = ", ".join(selected_puzzles)
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
 
 def inject_timestamp_skew(
     session_rows: list[dict],
