@@ -349,6 +349,18 @@ def main():
         row["Emotional Tone of Teacher"],
       )
 
+ # =============================================================================
+ # Static null fields
+ # =============================================================================
+
+  rows = sg.assign_static_null_fields(
+    rows,
+  )
+
+  print("\nStatic null fields:")
+  for row in rows[:3]:
+    print(row)
+
 
 if __name__ == "__main__":
   main()
