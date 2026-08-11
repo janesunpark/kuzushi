@@ -302,6 +302,53 @@ def main():
         row["Puzzle Type"],
       )
 
+ # =============================================================================
+ # Puzzle challenge
+ # =============================================================================
+
+  rows = sg.assign_puzzle_challenge(
+      rows,
+      rng,
+    )
+ 
+  print("\nRows around when puzzle challenge is recorded:")
+
+  for row in rows:
+    if (
+      row["session_category"] == "Enrichment"
+      and date(2026, 3, 15) <= row["true_week_ending"] <= date(2026, 4, 19)
+    ):
+      print(
+        row["true_week_ending"],
+        row["student_id"],
+        row["Puzzle Type"],
+        row["Puzzle Challenge or Novelty"],
+      )
+
+ # =============================================================================
+ # Session context fields
+ # =============================================================================
+
+  cutoff_week = date(2025, 12, 14)
+
+  rows = sg.assign_session_context_fields(
+    rows,
+    rng,
+    cutoff_week,
+  )
+  
+  print("\nRows around when session context fields are recorded:")
+
+  for row in rows:
+    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+      print(
+        row["true_week_ending"],
+        row["session_category"],
+        row["Parent Interaction"],
+        row["Environment or Disruptions"],
+        row["Emotional Tone of Teacher"],
+      )
+
 
 if __name__ == "__main__":
   main()
