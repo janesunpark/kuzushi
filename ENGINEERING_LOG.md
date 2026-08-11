@@ -241,3 +241,127 @@ Option 2.
 - Calibration required checking distributions, not single runs — an early parameter choice that looked close on one seed turned out, across eight seeds, to average noticeably short of the real target, since a single favorable draw isn't the same evidence as a correct average. The final parameters were accepted once multi-seed testing showed both learners consistently landing near their real historical counts rather than matching by chance on one seed.
 - A deliberate stopping point was set here rather than continuing to tighten toward an exact historical match — the generator's job is to produce plausible, realistically asymmetric irregularity, not to reproduce one specific year's exact totals, and further precision past this point would cost real effort for no benefit to the generator's actual purpose.
 - This is the earliest instance in the project of a recurring calibration discipline: distrust a single seed's apparent success, and set an explicit, principled stopping point for "close enough" rather than let calibration effort expand without bound.
+
+---
+
+## Milestone 9 — Discrete two-phase distribution modeling, and a per-meeting pairing requirement
+
+*Internal cross-reference: blueprint §14, Entry 41.*
+
+**Problem**
+
+`Duration in Minutes` looked at first like a candidate for the same continuous-trend treatment as `Number of Pages Completed`, but the real values are discrete buckets (35/45/60/75/80/90/120 minutes), and the real shape change over the season is a genuine distributional shift — some values disappearing entirely, others becoming dominant — not a smooth drift a single interpolation formula could represent.
+
+**Options considered**
+
+1. Force a continuous trend formula onto the discrete values anyway, accepting some inaccuracy.
+2. Two discrete weighted distributions (early/late), split at the real boundary week where the shape genuinely changes.
+
+**Chosen solution**
+
+Option 2, plus a same-meeting pairing requirement (both students' rows for one Enrichment session share the identical drawn value) discovered by checking per-student distributions and finding them identical at every phase — unlike every other per-student field built so far.
+
+**Trade-offs**
+
+- Three bugs surfaced across separate rounds, all in this one function: a missing `cutoff_week` check for Jiu-Jitsu rows, a phase-boundary comparison using the wrong direction (confirmed by finding early-only values appearing exactly at the boundary week across 50 seeds), and — after fixing the direction — a paired distribution-variable swap that inverted the fix instead of completing it (confirmed at scale: the early distribution's signature values appearing hundreds of times strictly after the boundary, across 50 seeds).
+- None of the three were visible from reading the code in isolation; each required a targeted check for a specific impossible value showing up on the wrong side of a specific boundary. Consistent with the existing "bugs only findable by running it" pattern, not a new failure mode.
+
+---
+
+## Milestone 10 — Modeling a real, non-monotonic per-student progression instead of an assumed clean one
+
+*Internal cross-reference: blueprint §14, Entry 43.*
+
+**Problem**
+
+`Published Materials Used` needed per-student curriculum-level weights. The plausible assumption going in — a clean, monotonic level progression for both students over the season — held for one student (S02) and did not hold for the other (S01), whose real level usage moves forward, back, and forward again across the year.
+
+**Options considered**
+
+1. Smooth S01's data into the same clean monotonic shape assumed for S02, treating the irregularity as noise.
+2. Model each student's real, checked phase sequence directly, including S01's non-monotonic one, even without a confident explanation for why it happened.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 would have produced a tidier-looking generator at the cost of actively misrepresenting what the real data shows for one of the two students — exactly the kind of assumed-narrative-over-checked-data mistake this project's whole discipline exists to avoid.
+- A second, related mechanism — same-level Textbook/Workbook pairing for 2-item rows — was itself checked against real data rather than assumed (~86% same-level, ~14% genuine cross-level transitions) after an initial "sample two items independently" design was recognized as producing mostly-nonsensical output before it was ever run.
+- This function accumulated the most debugging rounds of any field in the generator — a list-vs-dict crash, a computed value never assigned to the row, a missing branch, and a same-level-selection bug passing probabilities where population values belonged. Worth noting as the point where per-field complexity crossed from "pick a value" into "pick a value and decide its relationship to another value in the same row," which Milestone 11 confirms was not a one-off.
+
+---
+
+## Milestone 11 — A genuine cross-field dependency, and a boundary-scoping mistake that recurred three times
+
+*Internal cross-reference: blueprint §14, Entry 44. See also Patterns Journal, "Two independent boundary conditions need two nested if/else pairs."*
+
+**Problem**
+
+`Puzzle Type`'s null-rate genuinely depends on `Primary Task Type`'s already-assigned value (confirmed directly: 100% populated for `Mixed`/`Puzzle`, ~25% for `Worksheet`) — the first field in the generator with a real dependency on another field's *value*, not just on `true_week_ending`. Compounding this, the two fields' own cutoffs don't align: `Puzzle Type` exists two weeks before `Primary Task Type` does, leaving a real coverage gap the original design didn't address at all.
+
+**Options considered**
+
+1. Treat the two boundary questions ("has this field's cutoff passed," "has the other field's cutoff passed") as one combined condition.
+2. Nest two separate `if`/`else` pairs, one per boundary question, with the per-row values needed by both computed once, above the split.
+
+**Chosen solution**
+
+Option 2 — but it took three attempts to actually land there.
+
+**Trade-offs**
+
+- Every intermediate attempt collapsed the two boundary questions back into one merged pair in a different surface shape each time: first as a literally duplicated condition, then as an `else` reattached to the wrong (outer) gate — catching Jiu-Jitsu and pre-cutoff rows in logic meant only for late-Enrichment ones, crashing with `KeyError: None`. A third, related bug in the same function — shared per-row values computed in only one branch, silently reused by the other via Python's loop-variable persistence rather than genuine sharing — corrupted per-student calibration without crashing at all, confirmed by finding both students' empirical distributions converging toward each other instead of their own separate real targets.
+- Final verification across 100 seeds: zero boundary violations, the real `Worksheet` null rate reproduced almost exactly, and — the check that actually mattered — the two students' distributions landing distinctly near their own targets again once the shared-computation bug was fixed.
+- Promoted to its own Patterns Journal entry given it recurred three times within one function's debugging history alone, not because any single occurrence was unusual on its own.
+
+---
+
+## Milestone 12 — Discovering a category of fields determined by another field's state, not independently calibrated
+
+*Internal cross-reference: blueprint §14, Entry 45. See also Patterns Journal, "Fields fully or partly determined by another field's already-assigned state."*
+
+**Problem**
+
+Every field built up to this point was calibrated as if every other field were irrelevant to it. Three fields built in close succession — `Puzzle Challenge or Novelty`, the three `assign_session_context_fields` columns, and `Puzzle Type`'s dependency on `Primary Task Type` (Milestone 11) — turned out not to fit that assumption, each confirmed directly against real data rather than guessed.
+
+**Options considered**
+
+1. Treat each of the three as an isolated special case, calibrated independently despite the real correlation.
+2. Model each dependency explicitly — a deterministic gate for `Puzzle Challenge`, a single shared null-gate for the three session-context fields, a probabilistic dependency for `Puzzle Type`.
+
+**Chosen solution**
+
+Option 2 for all three.
+
+**Trade-offs**
+
+- `Puzzle Challenge or Novelty` turned out to be the simplest function in the entire generator specifically because option 2 was correct — a perfect, zero-exception 1:1 relationship with `Puzzle Type` left nothing else to calibrate.
+- `assign_session_context_fields`'s apparent ~29%/45% null rates, calculated across the whole season, were entirely an artifact of the pre-cutoff period diluting the average — the true active-period rate for all three fields is 0% null. Caught by checking the active-period rate specifically rather than trusting the whole-season figure.
+- The real, generalizable lesson isn't "sometimes fields relate to each other," which is unsurprising — it's that this assumption held silently for over forty prior entries and was worth checking explicitly once a plausible-sounding dependency was suspected, the same discipline that already confirmed a *lack* of relationship between `Task Difficulty` and `Pages Completed` back in Milestone-adjacent Entry 40.
+
+---
+
+## Milestone 13 — Choosing statistical keyword-correlation over semantic generation for a free-text field
+
+*Internal cross-reference: blueprint §14, Entry 47 (Notes design).*
+
+**Problem**
+
+`Notes` is a substantial free-text field (0% null, ~209 words average) unlike every other field in the generator, which are all weighted draws from small, known vocabularies. The original, pre-project hope for this field was to support downstream keyword/theme-frequency analysis; a later, more sophisticated-sounding alternative — generating text whose sentiment or content coherently, specifically reflects each row's exact rating combination — was considered and set aside.
+
+**Options considered**
+
+1. True semantic correlation: generated text that specifically, coherently reflects the exact rating combination for its row.
+2. A themed fragment bank, sampled with probabilities that shift based on the row's own ratings for keywords/themes with a real, checked correlation — a soft, statistical correlation, not a semantic one.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 would require an LLM generation step — a fundamentally different architecture from the rest of this generator, which is pure weighted random sampling with no model calls. Not ruled out as a future capability, but not a fit for extending the existing pipeline as-is.
+- Option 2 turned out to map more naturally onto the *original* keyword-frequency goal than option 1 (sentiment analysis) would have — sentiment requires a classifier to agree the generated text carries the intended sentiment; keyword frequency is direct substring matching against fragments deliberately authored to contain the target vocabulary, sampled with probabilities deliberately tied to the row's own ratings. The generator produces the eventual downstream analysis result by construction, rather than hoping an NLP step discovers it.
+- Every candidate keyword/theme was tested against real data before being trusted, not assumed from a plausible-sounding pairing — the same discipline as every other field, applied to something much fuzzier than a value distribution. Results were genuinely mixed: `familiar` correlated strongly and broadly (up to +0.88 against `Resilience`); `independent`, `flexib`, `motivat`, `structure` correlated well against their hypothesized single field; `comparison`, despite being narratively prominent in the source research notes, showed no meaningful correlation against anything tested and was kept as flavor vocabulary only, not built into the correlation mechanism.
