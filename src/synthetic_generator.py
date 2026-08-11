@@ -1297,6 +1297,31 @@ def assign_session_context_fields(
   return finalized_rows
 
 
+def assign_static_null_fields(
+    session_rows: list[dict]
+) -> list[dict]:
+
+  finalized_rows = []
+
+  null_fields = [
+    "Email Address",
+    "Column 23",
+    "Column 24",
+    "Column 25",
+    "Task Difficulty or Novelty.1"
+  ]
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    for field in null_fields:
+      new_row[field] = None
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
 def inject_timestamp_skew(
     session_rows: list[dict],
     synthesis_log_rows: list[dict],
