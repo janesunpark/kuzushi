@@ -1133,17 +1133,14 @@ def assign_puzzle_type(
       new_row["true_week_ending"] >= cutoff_week
       and new_row["session_category"] == "Enrichment"
     ):
+      student_id = new_row["student_id"]
+      puzzles = item_distribution[student_id]["items"]
+      weights = item_distribution[student_id]["weights"]
+      weights = weights / weights.sum()
 
       if new_row["true_week_ending"] < primary_task_type_cutoff_week:
-        student_id = new_row["student_id"]
-        puzzles = item_distribution[student_id]["items"]
-        weights = item_distribution[student_id]["weights"]
-        weights = weights / weights.sum()
-
-        if new_row["true_week_ending"] < primary_task_type_cutoff_week:
-
-          if rng.random() >= 0.5:
-            new_row["Puzzle Type"] = str(rng.choice(puzzles, p=weights))
+        if rng.random() >= 0.5:
+          new_row["Puzzle Type"] = str(rng.choice(puzzles, p=weights))
 
       else:
         task_type = new_row['Primary Task Type']
@@ -1154,7 +1151,6 @@ def assign_puzzle_type(
 
           else:
             counts = item_counts[task_type]["counts"]
-
             probs = item_counts[task_type]["weights"]
             probs = probs / probs.sum()
 
@@ -1176,6 +1172,125 @@ def assign_puzzle_type(
           ]
 
           new_row["Puzzle Type"] = ", ".join(selected_puzzles)
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_puzzle_challenge(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  item_weights = {
+    "rates": np.arange(1, 6),
+    "weights": np.array([5, 2, 7, 9, 5]),
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    new_row["Puzzle Challenge or Novelty"] = None
+
+    if new_row["Puzzle Type"] is not None:
+      ratings = item_weights["rates"]
+      weights = item_weights["weights"]
+      weights = weights / weights.sum()
+
+      new_row["Puzzle Challenge or Novelty"] = int(
+        rng.choice(
+          ratings,
+          p=weights
+        )
+      )
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_session_context_fields(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  enrichment_weights = {
+    "Parent Interaction": {
+      "No" : 58,
+      "Yes" : 36,
+    },
+    "Environment or Disruptions": {
+      "Quiet": 76,
+      "Time Constraints": 8,
+      "Distracting": 7,
+      "Noisy": 3,
+    },
+    "Emotional Tone of Teacher": {
+      "ratings": np.arange(1, 6),
+      "weights": np.array([0, 1, 77, 8, 8]),
+    },
+  }
+
+  jiu_jitsu_weights = {
+    "Parent Interaction": {
+      "No": 7,
+      "Yes": 5,
+    },
+    "Environment or Disruptions": {
+      "Quiet": 9,
+      "Time Constraints": 0,
+      "Distracting": 1,
+      "Noisy": 2
+    },
+    "Emotional Tone of Teacher": {
+      "ratings": np.arange(1, 6),
+      "weights": np.array([0, 0, 9, 3, 0]),
+    }
+  }
+
+  session_contexts = {
+    "Enrichment": enrichment_weights,
+    "Jiu-Jitsu": jiu_jitsu_weights,
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    if new_row["true_week_ending"] >= cutoff_week:
+      session_context = session_contexts[new_row["session_category"]]
+
+      for domain, distribution in session_context.items():
+
+        if domain == "Emotional Tone of Teacher":
+          ratings = distribution["ratings"]
+          weights = distribution["weights"]
+          weights = weights / weights.sum()
+
+          new_row[domain] = int(
+            rng.choice(
+              ratings,
+              p=weights,
+            )
+          )
+
+        else: 
+          contexts = list(distribution.keys())
+          weights = np.array(list(distribution.values()))
+          weights = weights / weights.sum()
+
+          new_row[domain] = str(
+            rng.choice(contexts, p=weights)
+          )
+
+    else:
+      for domain in enrichment_weights:
+        new_row[domain] = None
 
     finalized_rows.append(new_row)
 
