@@ -1322,6 +1322,243 @@ def assign_static_null_fields(
   return finalized_rows
 
 
+def assign_notes(
+    session_rows: list[dict],
+    rng: np.random.Generator,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  theme_bank = {
+
+    # ============ Correlated themes ============ #
+
+    "familiar": {
+      "base_weight": 0.143,
+      "correlated_field": "Resilience",
+      "fragments": [
+        "Approached the more constrained puzzle by placing familiar shapes first before adjusting to the rest.",
+        "Recovered quickly from an early misstep by falling back on a familiar strategy used successfully in prior sessions.",
+        "Used a completed model from an earlier task as a familiar visual reference point when the new version proved harder.",
+        "Returned to a familiar entry point after an initial attempt didn't work, then adjusted from there.",
+        "Drew on a familiar shape-manipulation technique to work through the more difficult section.",
+      ],
+      "fragments_jj": [
+        "Recognized the familiar warm-up sequence from a previous class and started right away.",
+        "Returned to a familiar move without needing a reminder of the steps.",
+      ],
+    },
+
+    "flexib": {
+      "base_weight": 0.162,
+      "correlated_field": "Problem-Solving or Cognitive Flexibility",
+      "fragments": [
+        "Showed a flexible approach when the first strategy wasn't working, without becoming stuck on it.",
+        "Flexibly moved between two different problem-solving approaches within the same task.",
+        "Tackled problems using a creative strategy and cognitive flexibility.",
+        "Flexibly handled an unexpected change in task rules with minimal disruption to focus.",
+      ],
+      "fragments_jj": None,
+    },
+
+    "independen": {
+      "base_weight": 0.318,
+      "correlated_field": "Confidence, Autonomy, or Initiative",
+      "fragments": [
+        "Completed the task independently, checking in only once the section was finished.",
+        "Made an independent choice about how to approach the activity before any suggestion was offered.",
+        "Worked through a full page independently, referring back to earlier examples when needed.",
+        "Independently started the next task before being asked.",
+      ],
+      "fragments_jj": [
+        "Put on and adjusted their own belt independently.",
+        "Independently helped gather equipment after the drill.",
+      ],
+    },
+
+    "engag": {
+      "base_weight": 0.481,
+      "correlated_field": "Focus or Attention",
+      "fragments": [
+        "Remained engaged with the task for the full session with only brief attention lapses.",
+        "Stayed engaged through a longer task sequence than in recent prior sessions.",
+        "Needed one redirect to re-engage after a short distraction, then sustained focus afterward.",
+        "Showed sustained engagement during a repetitive portion of the task that has previously been harder to hold interest in.",
+      ],
+      "fragments_jj": [
+        "Remained engaged through the full drill sequence without needing redirection.",
+        "Needed one redirect to refocus after becoming distracted, then engaged fully afterward.",
+        "Stayed engaged during partner drills despite a livelier-than-usual room.",
+      ],
+    },
+
+    "motivat": {
+      "base_weight": 0.260,
+      "correlated_field": "Confidence, Autonomy, or Initiative",
+      "fragments": [
+        "Was motivated to try the next page before being prompted to move on.",
+        "Stayed motivated to work past the point where the session would typically wrap up.",
+        "Stayed motivated through a task that had been challenging in earlier sessions.",
+        "Was motivated to redo an earlier section without being asked, aiming to improve on the first attempt.",
+        "Showed motivation to complete more tasks after finishing one.",
+      ],
+      "fragments_jj": [
+        "Showed motivation to demonstrate when a new drill was introduced.",
+        "Was motivated to work on a favorite drill and asked to repeat it.",
+      ],
+    },
+
+    "structure": {
+      "base_weight": 0.247,
+      "correlated_field": "Problem-Solving or Cognitive Flexibility",
+      "fragments": [
+        "Worked through the task in a clear, self-imposed structure rather than jumping between sections.",
+        "Structured a multi-part task into clearly ordered pieces and completed them in sequence.",
+      ],
+      "fragments_jj": [
+        "Followed the structured drill in order without needing reminders partway through.",
+        "Remembered the structured sequence of steps in the double leg takedown and repeated it without help.",
+        "Completed a structured series of movements during the drill with minimal prompting."
+      ],
+    },
+    "spatial_pattern": {
+      "base_weight": 0.331,
+      "correlated_field": "Abstract Thinking and Pattern Recognition",
+      "fragments": [
+        "Identified the repeating pattern within the first few pieces and completed the rest with minimal hesitation.",
+        "Correctly identified the next element in the spatial sequence before it appeared.",
+        "Pointed out that two separate parts of the task followed the same underlying pattern.",
+        "Grouped pieces together based on a shared spatial relationship.",
+      ],
+      "fragments_jj": [
+        "Matched the demonstrated position correctly, following the same pattern shown.",
+        "Spatially positioned themselves correctly relative to a partner after watching the instructor.",
+      ],
+    },
+
+    # ============ Flavor themes -- no correlated_field ============ #
+
+    "comparison": {
+      "base_weight": 0.155,
+      "correlated_field": None,
+      "fragments": [
+        "Visibly compared themselves to the other student's work partway through the task.",
+        "Asked how their result compared to a previous attempt, seeking the instructor's affirmation.",
+        "Compared their tasks to the other student's, remarking which ones seemed easier or harder.",
+      ],
+      "fragments_jj": None,
+    },
+
+    "reward": {
+      "base_weight": 0.338,
+      "correlated_field": None,
+      "fragments": [
+        "Reacted with visible smile upon receiving a sticker reward for completing the task.",
+        "Confirmed how many stickers they would need to earn a reward before starting the activity.",
+        "Chose the next activity based on which one had a reward attached.",
+      ],
+      "fragments_jj": None,
+    },
+
+    "novelty": {
+      "base_weight": 0.156,
+      "correlated_field": None,
+      "fragments": [
+        "Expressed curiosity toward a novel strategic game.",
+        "Responded positively to a novel set of materials introduced partway through the session.",
+        "Responded positively to novel rewards and completed additional tasks to earn them.",
+      ],
+      "fragments_jj": None,
+    },
+
+    "scaffold": {
+      "base_weight": 0.104,
+      "correlated_field": None,
+      "fragments": [
+        "Completed the first two steps independently, then used them as scaffolds to tackle another problem.",
+        "Followed along after the instructor scaffolded the problem.",
+        "Used a partially completed example as a scaffolded reference before continuing on their own.",
+      ],
+      "fragments_jj": None,
+    },
+  }
+
+  bullet_count = {
+   1 : 1, 
+   2 : 11, 
+   3 : 10,
+   4 : 28,
+   5 : 19,
+   6 : 27,
+   7 : 19,
+   8 : 12,
+   9 : 8,
+   10 : 6,
+   11 : 5,
+   12 : 4,
+   13 : 2, 
+   14 : 2,
+  }
+
+  for row in session_rows:
+    new_row = row.copy()
+
+    is_jj = row["session_category"] == "Jiu-Jitsu"
+
+    eligible = [
+      name for name, theme in theme_bank.items()
+      if not is_jj or theme["fragments_jj"] is not None
+    ]
+
+    weights = []
+
+    for name in eligible:
+      theme = theme_bank[name]
+      w = theme["base_weight"]
+      field = theme["correlated_field"]
+
+      if field is not None:
+        rating = row.get(field)
+
+        if rating is not None:
+          rating_offset = (rating - 3) / 2
+          w = w * max(1 + rating_offset, 0.15)
+
+      weights.append(w)
+
+    weights = np.array(weights)
+    weights = weights / weights.sum()
+
+    counts = list(bullet_count.keys())
+    count_weights = np.array(list(bullet_count.values()))
+    count_weights = count_weights / count_weights.sum()
+    n_bullets = int(
+      rng.choice(
+        counts,
+        p=count_weights
+      )
+    )
+    n_bullets = min(n_bullets, len(eligible))
+
+    selected = rng.choice(
+      eligible,
+      size=n_bullets,
+      replace=False,
+      p=weights
+    )
+
+    bullets = []
+    for theme_name in selected:
+      theme = theme_bank[theme_name]
+      pool = theme["fragments_jj"] if is_jj else theme["fragments"]
+      bullets.append(str(rng.choice(pool)))
+
+    new_row["Notes"] = "* " + "\n* ".join(bullets)
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
 def inject_timestamp_skew(
     session_rows: list[dict],
     synthesis_log_rows: list[dict],
@@ -1368,5 +1605,3 @@ def inject_timestamp_skew(
     skewed_schedule,
     key=lambda row: row["timestamp"]
   )
-
-
