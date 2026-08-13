@@ -365,3 +365,52 @@ Option 2.
 - Option 1 would require an LLM generation step — a fundamentally different architecture from the rest of this generator, which is pure weighted random sampling with no model calls. Not ruled out as a future capability, but not a fit for extending the existing pipeline as-is.
 - Option 2 turned out to map more naturally onto the *original* keyword-frequency goal than option 1 (sentiment analysis) would have — sentiment requires a classifier to agree the generated text carries the intended sentiment; keyword frequency is direct substring matching against fragments deliberately authored to contain the target vocabulary, sampled with probabilities deliberately tied to the row's own ratings. The generator produces the eventual downstream analysis result by construction, rather than hoping an NLP step discovers it.
 - Every candidate keyword/theme was tested against real data before being trusted, not assumed from a plausible-sounding pairing — the same discipline as every other field, applied to something much fuzzier than a value distribution. Results were genuinely mixed: `familiar` correlated strongly and broadly (up to +0.88 against `Resilience`); `independent`, `flexib`, `motivat`, `structure` correlated well against their hypothesized single field; `comparison`, despite being narratively prominent in the source research notes, showed no meaningful correlation against anything tested and was kept as flavor vocabulary only, not built into the correlation mechanism.
+
+---
+
+## Milestone 14 — Verifying generated correlation strength, not just generative mechanism correctness
+
+*Internal cross-reference: blueprint §15, Entry 48. See also Patterns Journal, "A correctly-calibrated selection mechanism doesn't guarantee the generated content carries the measurable signal."*
+
+**Problem**
+
+`assign_notes`'s theme-sampling weights were built and confirmed correct at the row level — high ratings correctly shifted probability toward their correlated themes. Running the same aggregate "mean rating with vs. without keyword" test used to validate every real-CSV correlation earlier in this project, but against *generated* output, revealed four of seven themes showing zero measurable signal despite correct selection logic.
+
+**Options considered**
+
+1. Trust the row-level trace as sufficient verification, since the selection mechanism was demonstrably correct.
+2. Run the full aggregate correlation test against generated output, the same test standard used for every real-data correlation claim in this project, and treat a gap between the two as a real bug even though nothing crashed.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- The root cause, once found, was simple: most fragments in the affected themes were thematically related to their keyword but never literally contained it as a substring — a keyword-frequency analysis run against the generated text would find nothing to count, regardless of how correctly the underlying theme got selected. Fixed by auditing every fragment for literal keyword presence and rewriting the ones that lacked it, then rerunning the same aggregate test until all seven themes showed real, correctly-signed diffs against their real targets.
+- Two further bugs surfaced only through the same aggregate-verification habit, not through reading the code: `familiar`'s `correlated_field` was set to the full real CSV header rather than the internal short key `assign_secondary_ratings` actually produces, silently returning `None` on every row and producing zero data points — invisible until `familiar` alone came back empty against six working sibling themes. And the rating-adjustment formula could reach exactly zero at the lowest rating value, which — since two themes share one correlated field — could occasionally zero out enough themes simultaneously to leave fewer selectable options than the row's drawn bullet count, crashing the without-replacement sampling call. Fixed with a floor on the adjustment multiplier so suppression stays real but never total.
+- The general lesson, worth carrying forward: when a generator's calibration claim is about a *downstream measurable property* (a correlation, a frequency, a distribution), verification needs to check that property directly on generated output — not just confirm the generative mechanism looks correct in isolation. The two can and did diverge here without anything failing loudly.
+
+---
+
+## Milestone 15 — Closing out session-row richness, and naming what's still ahead precisely
+
+*Internal cross-reference: blueprint §15, Entry 48.*
+
+**Problem**
+
+After `assign_notes`, it was worth checking directly whether "session-row richness is done" also meant "the synthetic generator is done" — an assumption worth verifying against the real weekly synthesis CSV and the actual file contents rather than accepting from momentum.
+
+**Options considered**
+
+1. Treat the generator as complete now that every session-observation-log column has a working `assign_` function.
+2. Check the real weekly synthesis CSV's columns and the generator file directly before making that claim.
+
+**Chosen solution**
+
+Option 2 — confirmed session-row richness is genuinely complete, and confirmed directly that it is not the whole generator.
+
+**Trade-offs**
+
+- The check was cheap and conclusive: `generate_synthesis_log_rows` currently produces only `week_ending` and `num_sessions_reported`, while the real weekly synthesis CSV has ten additional columns (`Snapshot`, `Notable Shifts or Confirmations`, `Learning Mechanisms Observed`, `Optional: Data Flags`, `Are participants siblings?`, `Dyad ID`, JJ-learner selection, private-lesson selection, three ghost columns) with no corresponding enrichment logic anywhere in the file — and no CSV-writer function exists at all yet.
+- Worth naming as its own habit: "is phase X done" and "is the whole project done" are different claims, and the gap between them is exactly the kind of thing worth checking against source material rather than inferring from the momentum of just finishing a hard piece of work.
