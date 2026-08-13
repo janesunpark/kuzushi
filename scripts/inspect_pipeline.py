@@ -361,6 +361,19 @@ def main():
   for row in rows[:3]:
     print(row)
 
+# =============================================================================
+# Notes
+# =============================================================================
+
+  rows = sg.assign_notes(
+    rows,
+    rng,
+  )
+
+  print("\nNotes:")
+  for row in rows[-3:]:
+    print(row)
+
 
 if __name__ == "__main__":
   main()
