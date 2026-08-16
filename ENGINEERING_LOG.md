@@ -414,3 +414,29 @@ Option 2 — confirmed session-row richness is genuinely complete, and confirmed
 
 - The check was cheap and conclusive: `generate_synthesis_log_rows` currently produces only `week_ending` and `num_sessions_reported`, while the real weekly synthesis CSV has ten additional columns (`Snapshot`, `Notable Shifts or Confirmations`, `Learning Mechanisms Observed`, `Optional: Data Flags`, `Are participants siblings?`, `Dyad ID`, JJ-learner selection, private-lesson selection, three ghost columns) with no corresponding enrichment logic anywhere in the file — and no CSV-writer function exists at all yet.
 - Worth naming as its own habit: "is phase X done" and "is the whole project done" are different claims, and the gap between them is exactly the kind of thing worth checking against source material rather than inferring from the momentum of just finishing a hard piece of work.
+
+---
+
+## Milestone 16 — The barrel module that wasn't
+
+*Internal cross-reference: blueprint §16, Entry 49. See also Patterns Journal, "Wildcard imports silently exclude underscore-prefixed names" and "Bugs only findable by running the code, not reading it."*
+
+**Problem**
+
+At 1600+ lines, `synthetic_generator.py` was split by concern into `_helpers.py`, `schedule_generation.py`, `session_enrichment.py`, and `synthesis_enrichment.py`, with `synthetic_generator.py` meant to become a thin barrel module re-exporting everything, so `test_synthetic_generator.py` and `inspect_pipeline.py` could keep calling `sg.function_name(...)` without any changes on their end.
+
+**Options considered**
+
+1. Trust that the split was complete once the new files existed and `synthetic_generator.py`'s first few lines showed the new wildcard imports.
+2. Verify by actually running the full pipeline through the real barrel module, the same standard applied to every other piece of this project.
+
+**Chosen solution**
+
+Option 2 — and it caught two separate, real problems option 1 would have missed entirely.
+
+**Trade-offs**
+
+- First: `schedule_generation.py` and `session_enrichment.py` used wildcard imports (`from src.generator._helpers import *`) to pull in their dependencies, but every helper in `_helpers.py` is deliberately underscore-prefixed — and Python's `import *` silently excludes underscore names by default. The pipeline crashed with `NameError` the moment it actually ran, not before. Fixed with explicit imports for the specific underscore names each file needed.
+- Second, more subtle: `synthetic_generator.py` itself was never actually reduced to a barrel — the four new wildcard-import lines had been added to the *top* of the file, but the full original 1611 lines of function definitions were still sitting underneath, completely intact. `head` and `grep "^from"` both looked correct; only checking the *whole* file for lingering `def` statements (and noticing the line count hadn't meaningfully changed) revealed it. An `hasattr(sg, '_find_phase')` check that returned `True` initially looked like confirmation the new structure worked — it was actually evidence the old code was still doing the work.
+- Fixing the second problem reintroduced the first one in miniature: once `synthetic_generator.py` was genuinely reduced to just wildcard imports, `sg._generate_rng` — the one underscore-prefixed name both `test_synthetic_generator.py` and `inspect_pipeline.py` call directly — stopped being accessible, for exactly the same reason as the first bug. Fixed by adding one explicit import line for it alongside the wildcards.
+- Final verification: 25 tests passing via `pytest`, and `python -m scripts.inspect_pipeline` producing the expected output — confirmed against the actual project files, not just a standalone reproduction.
