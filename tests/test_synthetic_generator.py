@@ -403,6 +403,7 @@ def test_pages_completed_boundary_week_is_already_active():
 # Timestamp skew
 # =============================================================================
 
+cutoff_week = date(2026, 1, 25)
 
 def test_timestamp_skew_does_not_mutate_original_rows():
   rng = sg._generate_rng(42)
@@ -413,7 +414,11 @@ def test_timestamp_skew_does_not_mutate_original_rows():
 
   sg.inject_timestamp_skew(
     session_rows,
-    sg.generate_synthesis_log_rows(combined_schedule, 2),
+    sg.generate_synthesis_log_rows(
+      combined_schedule, 
+      cutoff_week=cutoff_week, 
+      n_skipped_weeks=2
+      ),
     sg._generate_rng(42),
     n_skewed_weeks=2,
   )
@@ -429,7 +434,11 @@ def test_returned_schedule_has_the_same_number_of_rows():
 
   skewed_schedule = sg.inject_timestamp_skew(
     session_rows,
-    sg.generate_synthesis_log_rows(combined_schedule, 2),
+    sg.generate_synthesis_log_rows(
+      combined_schedule, 
+      cutoff_week=cutoff_week, 
+      n_skipped_weeks=2
+      ),
     sg._generate_rng(42),
     n_skewed_weeks=2,
   )
