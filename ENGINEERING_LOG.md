@@ -440,3 +440,58 @@ Option 2 — and it caught two separate, real problems option 1 would have misse
 - Second, more subtle: `synthetic_generator.py` itself was never actually reduced to a barrel — the four new wildcard-import lines had been added to the *top* of the file, but the full original 1611 lines of function definitions were still sitting underneath, completely intact. `head` and `grep "^from"` both looked correct; only checking the *whole* file for lingering `def` statements (and noticing the line count hadn't meaningfully changed) revealed it. An `hasattr(sg, '_find_phase')` check that returned `True` initially looked like confirmation the new structure worked — it was actually evidence the old code was still doing the work.
 - Fixing the second problem reintroduced the first one in miniature: once `synthetic_generator.py` was genuinely reduced to just wildcard imports, `sg._generate_rng` — the one underscore-prefixed name both `test_synthetic_generator.py` and `inspect_pipeline.py` call directly — stopped being accessible, for exactly the same reason as the first bug. Fixed by adding one explicit import line for it alongside the wildcards.
 - Final verification: 25 tests passing via `pytest`, and `python -m scripts.inspect_pipeline` producing the expected output — confirmed against the actual project files, not just a standalone reproduction.
+
+---
+
+## Milestone 17 — `generate_synthesis_log_rows` needed a real cutoff, and fixing it broke tests twice before it broke them zero times
+
+*Internal cross-reference: blueprint §16, Entry 50. See also Patterns Journal, "Positional arguments silently break when a function's signature changes."*
+
+**Problem**
+
+`generate_synthesis_log_rows` produced 39 rows spanning the full season; the real weekly synthesis log has 20, entirely confined to `2026-01-25` onward — a structural gap caught only by comparing generated row counts against the real CSV directly, not by reading the function.
+
+**Options considered**
+
+1. Add a `cutoff_week` parameter and update every call site to match.
+2. Same, but patch existing positional call sites minimally rather than converting them fully to keyword arguments.
+
+**Chosen solution**
+
+Option 1, arrived at after option 2's minimal-patch instinct produced a worse failure than the one it was fixing.
+
+**Trade-offs**
+
+- Inserting `cutoff_week` into the middle of the signature broke an existing positional test call immediately (`TypeError`) — expected, and the reason keyword arguments matter for any call site that survives a signature change.
+- The first attempted fix converted only the new argument to a keyword, leaving a trailing positional argument after it — syntactically invalid in Python regardless of what the values would have meant, and unlike a runtime `TypeError`, a `SyntaxError` prevents the entire file from being collected by `pytest`. All 25 tests reported as failing, not just the two touching this function, which was momentarily alarming out of proportion to the actual size of the bug.
+- Final fix converted both affected call sites fully to keyword arguments, immune to any future reordering. Verified against the real project files: 25 passing, `inspect_pipeline` producing expected output.
+- The cutoff date itself required no independent derivation — `2026-01-25` was already established for the session-level `Sibling Dyad` transition, and the real weekly synthesis log's own first entry matches it exactly, strong evidence of one real shared event rather than two coincidental ones.
+
+---
+
+## Milestone 18 — Two synthesis-row functions: a grain question worth asking explicitly, and a conditional-probability correction
+
+*Internal cross-reference: blueprint §16, Entries 51–52. See also Patterns Journal, "Independent projections at the grain each consumer needs" and "Fields fully or partly determined by another field's already-assigned state."*
+
+**Problem**
+
+Two functions needed building on the corrected `generate_synthesis_log_rows` foundation: seven trivial always-fixed fields, and a two-field cluster (`JJ Observed`, `Private Lessons`) with a real cross-field dependency and a genuine data-provenance concern.
+
+**Options considered**
+
+1. For `Student ID`: default to the same per-student explosion already used for the session log, on the reasoning that consistency across the generator is simpler to maintain.
+2. For `Student ID`: check the real weekly synthesis CSV's actual grain before assuming the session log's precedent transfers.
+3. For the two dependent fields: draw each independently, letting the real cross-field correlation emerge or not by chance.
+4. For the two dependent fields: model the confirmed dependency explicitly, gating one field's draw on the other's already-decided value.
+
+**Chosen solution**
+
+Option 2 and option 4.
+
+**Trade-offs**
+
+- Option 2 confirmed the session log's explosion doesn't transfer — every real weekly synthesis row uses the single combined `"S01, S02"` string, reflecting one real submission per week about the dyad, a genuinely different real observation practice from the session log's two-submissions-per-shared-session pattern. Exploding it anyway would have invented a shape the real data doesn't have, for the sake of surface consistency with an unrelated decision.
+- Option 4 required more than just adding a gate: the first draft's null-rate for `JJ Observed` reused an *unconditional* active-period figure inside a branch that only runs for the *subset* where `Private Lessons` is already populated — caught by tracing the code's actual nesting structure, not by re-checking whether the original number itself was correctly computed (it was, for a different, no-longer-relevant question). Recomputed against the correct subset: `9/14` null rather than the unconditional `0.6875`.
+- A real, scoped design decision on null-handling style: whether to fold `None` directly into a weighted-choice array or keep the separate-`is_null`-then-branch pattern used elsewhere. Kept the combined form for these two fields specifically (few total outcomes, null genuinely being just one more simple option among them), explicitly not generalized to every field, since most fields' null-rate and value-distribution answer different real-world questions that benefit from staying separately calibrated.
+- `Private Lessons` was flagged as a genuinely different category of data-quality concern from anything else in this project — not a small-sample-size confidence question, but secondhand information (parental report) that was never directly, weekly-verified the way every other observed field was. Flagged explicitly as a Silver/Gold-layer exclusion candidate rather than left to blend in with the rest of the dataset's implied trustworthiness.
+- Final verification, 100 seeds: zero violations across every boundary and dependency check, both distributions within a point of their real targets.

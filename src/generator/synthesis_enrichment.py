@@ -1,3 +1,7 @@
+from datetime import date, datetime
+import numpy as np
+
+
 def assign_synthesis_static_fields(
     synthesis_rows: list[dict],
 ) -> list[dict]:
@@ -13,6 +17,37 @@ def assign_synthesis_static_fields(
     new_row["Column 10"] = None
     new_row["Column 11"] = None
     new_row["Column 12"] = None
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_jj_synthesis_fields(
+    synthesis_rows: list[dict],
+    rng: np.random.Generator,
+    cutoff_week: date,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  for row in synthesis_rows:
+    new_row = row.copy()
+
+    new_row["JJ Observed"] = None
+    new_row["Private Lessons"] = None
+
+    if new_row["week_ending"] >= cutoff_week:
+      new_row["Private Lessons"] = rng.choice(
+        ["S02", None],
+        p=[0.875, 0.125],
+      )
+
+      if new_row["Private Lessons"] != None:
+        new_row["JJ Observed"] = rng.choice(
+          [None, "S01, S02", "S02"],
+          p=[9/14, 3/14, 2/14],
+        )
 
     finalized_rows.append(new_row)
 
