@@ -1,6 +1,7 @@
 from src.generator._helpers import _find_phase, _level_weights, END
 from src.generator.schedule_generation import *  
 
+
 def assign_observer_id(
     session_rows: list[dict],
     transition_week: date,
