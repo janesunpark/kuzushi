@@ -71,4 +71,4 @@ These derived structures will be used for exploratory analysis only. They are no
 
 ## Use of AI Assistance 
 
-AI-assisted tools were used to support organization, drafting, and editing of public-facing documentation. The author remained responsible for observation, interpretation, anonymization, and final review. 
+The project's concept, scope, and research questions originated entirely with the author. AI-assisted tools were used throughout the project to support software development, debugging, code review, engineering design discussions, organization, and drafting and editing of documentation. AI assistance was used as a collaborative development and writing aid; the author remained responsible for research design, data collection and observation, interpretation, anonymization, methodological decisions, verification of generated code and outputs, and final review of all project materials.
