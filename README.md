@@ -118,8 +118,6 @@ The author is not a licensed psychologist, therapist, or child development speci
 
 ## License & Use
 
-## License & Use
-
 This repository is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). Public-facing materials may be read and referenced with appropriate attribution for noncommercial purposes; the observational framework, research notes, and project structure may not be used commercially, including as child-level assessment materials, without permission.
 
 Raw observation logs, private data, videos, photos, and identifying details are not included in this repository and are not available for public use.
