@@ -114,13 +114,15 @@ This project was developed by an educator transitioning into data science and so
 
 Kuzushi was shaped in part by the author's own Jiu Jitsu training and by the training community that helped her see problem-solving, adaptation, and resilience in a more embodied way. The author is grateful to her coaches, teammates, and students for being part of the learning environments that made this project possible. 
 
-The author is not a licensed psychologist, therapist, or child development specialist. Developmental and psychological language used throughout this project reflects personal observation, pedagogical experience, and independent research—not professional or clinical assessment.
+The author is not a licensed psychologist, therapist, or child development specialist. Developmental and psychological language used throughout this project reflects personal observation, pedagogical experience, and independent research; it does not constitute professional or clinical assessment.
 
 ## License & Use
 
-This repository is shared for documentation, portfolio, and academic review purposes only. Public-facing materials may be read and referenced with appropriate attribution, but the observational framework, research notes, and project structure should not be reused, redistributed, or adapted as child-level assessment materials without permission.
+## License & Use
 
-Raw observation logs, private data, videos, photos, and identifying details are not included in this repository and are not available for public use. 
+This repository is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). Public-facing materials may be read and referenced with appropriate attribution for noncommercial purposes; the observational framework, research notes, and project structure may not be used commercially, including as child-level assessment materials, without permission.
+
+Raw observation logs, private data, videos, photos, and identifying details are not included in this repository and are not available for public use.
 
 Copyright © 2026 Jane Park
 
