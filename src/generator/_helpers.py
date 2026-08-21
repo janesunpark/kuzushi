@@ -1,4 +1,5 @@
 from datetime import date, datetime, time, timedelta
+from collections import Counter
 import numpy as np
 
 # =================================================================================
@@ -99,3 +100,50 @@ def _level_weights(weights):
     level_totals[level] = level_totals.get(level, 0) + count
 
   return level_totals
+
+
+def _select_weekly_narrative_themes(
+    week_enrichment_counts: dict[str, Counter],
+    week_jj_themes: dict[str, set],
+) -> dict:
+
+  cross_learner_raw = []
+  s01_individual_raw = []
+  s02_individual_raw = []
+
+  s01_counter = week_enrichment_counts["S01"]
+  s02_counter = week_enrichment_counts["S02"]
+  s01_jj = week_jj_themes.get("S01", set())
+  s02_jj = week_jj_themes.get("S02", set())
+
+  all_theme_names = set(s01_counter) | set(s02_counter)
+
+  for theme in all_theme_names:
+    in_s01 = theme in s01_counter
+    in_s02 = theme in s02_counter
+
+    if in_s01 and in_s02:
+      score = min(s01_counter[theme], s02_counter[theme])
+      has_jj = theme in s01_jj or theme in s02_jj
+      cross_learner_raw.append((theme, score, has_jj))
+
+    elif in_s01:
+      s01_individual_raw.append((theme, s01_counter[theme], theme in s01_jj))
+    else:
+      s02_individual_raw.append((theme, s02_counter[theme], theme in s02_jj))
+
+  def _rank(bucket):
+    return sorted(bucket, key=lambda entry: (entry[1], entry[2]), reverse=True)
+
+  all_themes = {
+    "cross_learner": _rank(cross_learner_raw),
+    "S01_individual": _rank(s01_individual_raw),
+    "S02_individual": _rank(s02_individual_raw),
+  }
+
+  top_themes = {
+    bucket: entries[:2]
+    for bucket, entries in all_themes.items()
+  }
+
+  return {"all_themes": all_themes, "top_themes": top_themes}
