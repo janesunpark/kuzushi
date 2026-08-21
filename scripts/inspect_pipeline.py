@@ -34,9 +34,9 @@ def main():
   print("\nRows around observation context:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["observation_context"],
       )
 
@@ -54,9 +54,9 @@ def main():
   print("\nRows around observer transition:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - transition_week).days) <= 7:
+    if abs((row["_true_week_ending"] - transition_week).days) <= 7:
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["student_id"],
         row["observer_id"],
       )
@@ -104,9 +104,9 @@ def main():
   print("\nRows around deprecated ratings:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["Coordination and Motor Skills"],
         row["Social Regulation"],
       )
@@ -132,11 +132,11 @@ def main():
 
   for row in rows:
     if (
-      row["session_category"] == "Enrichment"
-      and row["true_week_ending"] <= date(2025, 9, 21)
+      row["_session_category"] == "Enrichment"
+      and row["_true_week_ending"] <= date(2025, 9, 21)
     ):
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["student_id"],
         row["Number of Pages Completed"],
       )
@@ -145,11 +145,11 @@ def main():
 
   for row in rows:
     if (
-      row["session_category"] == "Enrichment"
-      and row["true_week_ending"] >= date(2026, 5, 17)
+      row["_session_category"] == "Enrichment"
+      and row["_true_week_ending"] >= date(2026, 5, 17)
     ):
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["student_id"],
         row["Number of Pages Completed"],
       )
@@ -169,10 +169,10 @@ def main():
   print("\nRows around task difficulty ratings:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
-        row["session_category"],
+        row["_true_week_ending"],
+        row["_session_category"],
         row["Task Difficulty or Novelty"],
       )
 
@@ -198,10 +198,10 @@ def main():
   print("\nRows around when duration gets logged:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
-        row["session_category"],
+        row["_true_week_ending"],
+        row["_session_category"],
         row["Duration in Minutes"],
       )
 
@@ -213,10 +213,10 @@ def main():
   print("\nRows around when duration changes:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - phase_shift_week).days) <= 7:
+    if abs((row["_true_week_ending"] - phase_shift_week).days) <= 7:
       print(
-        row["true_week_ending"],
-        row["session_category"],
+        row["_true_week_ending"],
+        row["_session_category"],
         row["Duration in Minutes"],
       )
 
@@ -235,10 +235,10 @@ def main():
   print("\nRows around when task types are recorded:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
-        row["session_category"],
+        row["_true_week_ending"],
+        row["_session_category"],
         row["Primary Task Type"],
       )
 
@@ -262,9 +262,9 @@ def main():
   print("\nRows around when books are recorded:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["student_id"],
         row["Published Materials Used"],
       )
@@ -292,19 +292,19 @@ def main():
 
   for row in rows:
     if (
-      row["session_category"] == "Enrichment"
-      and date(2026, 3, 15) <= row["true_week_ending"] <= date(2026, 4, 19)
+      row["_session_category"] == "Enrichment"
+      and date(2026, 3, 15) <= row["_true_week_ending"] <= date(2026, 4, 19)
     ):
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["student_id"],
         row["Primary Task Type"],
         row["Puzzle Type"],
       )
 
- # =============================================================================
- # Puzzle challenge
- # =============================================================================
+  # =============================================================================
+  # Puzzle challenge
+  # =============================================================================
 
   rows = sg.assign_puzzle_challenge(
       rows,
@@ -315,11 +315,11 @@ def main():
 
   for row in rows:
     if (
-      row["session_category"] == "Enrichment"
-      and date(2026, 3, 15) <= row["true_week_ending"] <= date(2026, 4, 19)
+      row["_session_category"] == "Enrichment"
+      and date(2026, 3, 15) <= row["_true_week_ending"] <= date(2026, 4, 19)
     ):
       print(
-        row["true_week_ending"],
+        row["_true_week_ending"],
         row["student_id"],
         row["Puzzle Type"],
         row["Puzzle Challenge or Novelty"],
@@ -340,18 +340,18 @@ def main():
   print("\nRows around when session context fields are recorded:")
 
   for row in rows:
-    if abs((row["true_week_ending"] - cutoff_week).days) <= 7:
+    if abs((row["_true_week_ending"] - cutoff_week).days) <= 7:
       print(
-        row["true_week_ending"],
-        row["session_category"],
+        row["_true_week_ending"],
+        row["_session_category"],
         row["Parent Interaction"],
         row["Environment or Disruptions"],
         row["Emotional Tone of Teacher"],
       )
 
- # =============================================================================
- # Static null fields
- # =============================================================================
+  # =============================================================================
+  # Static null fields
+  # =============================================================================
 
   rows = sg.assign_static_null_fields(
     rows,
@@ -361,9 +361,9 @@ def main():
   for row in rows[:3]:
     print(row)
 
-# =============================================================================
-# Notes
-# =============================================================================
+  # =============================================================================
+  # Notes
+  # =============================================================================
 
   rows = sg.assign_notes(
     rows,
@@ -373,6 +373,52 @@ def main():
   print("\nNotes:")
   for row in rows[-3:]:
     print(row)
+
+  # =============================================================================
+  # Synthesis enrichment
+  # =============================================================================
+
+  synthesis_cutoff = date(2026, 2, 22)
+
+  synthesis_rows = sg.generate_synthesis_log_rows(
+    schedule,
+    synthesis_cutoff,
+    2,
+  )
+
+  synthesis_rows = sg.assign_synthesis_static_fields(
+    synthesis_rows,
+  )
+
+  print("\nWSN Static Fields:")
+  for row in synthesis_rows[-3:]:
+    print(row)
+
+
+  synthesis_rows = sg.assign_jj_synthesis_fields(
+    synthesis_rows,
+    rng,
+    date(2026, 2, 22),
+  )
+
+  print("\nWSN JJ Fields:")
+  for row in synthesis_rows[-3:]:
+    print(row)
+
+
+  weekly_counts, weekly_jj_themes = sg.summarize_weekly_notes_themes(
+    rows,
+  )
+
+  print("\nWSN Notes Themes (last 3 weeks):")
+  for week in sorted(weekly_counts.keys())[-3:]:
+    print(f"Week {week}:")
+
+    for student, counter in weekly_counts[week].items():
+      print(f"  Enrichment themes, {student}: {dict(counter)}")
+    if week in weekly_jj_themes:
+      for student, theme_set in weekly_jj_themes[week].items():
+        print(f"  JJ themes, {student}: {theme_set}")
 
 
 if __name__ == "__main__":

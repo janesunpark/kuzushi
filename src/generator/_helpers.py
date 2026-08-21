@@ -75,11 +75,11 @@ def _generate_break_periods(
   return break_periods
 
 
-def _find_phase(phases, true_week_ending):
+def _find_phase(phases, _true_week_ending):
   selected_weights = None
 
   for start_date, weights in phases:
-    if start_date <= true_week_ending:
+    if start_date <= _true_week_ending:
       selected_weights = weights
     else:
       break
