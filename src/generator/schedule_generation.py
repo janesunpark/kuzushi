@@ -412,7 +412,7 @@ def derive_session_rows(
 
   for week in combined_schedule:
 
-    true_week_ending = week["week_ending"]
+    _true_week_ending = week["week_ending"]
 
     academic = week["academic"]
     if academic is not None:
@@ -420,10 +420,10 @@ def derive_session_rows(
         for student_id in academic["student_id"]:
           derived_session_rows.append(
             {
-              "true_week_ending": true_week_ending,
+              "_true_week_ending": _true_week_ending,
               "timestamp": timestamp,
               "student_id": student_id,
-              "session_category": "Enrichment",
+              "_session_category": "Enrichment",
               "observation_context": "Enrichment",
             }
           )
@@ -432,10 +432,10 @@ def derive_session_rows(
       for student_id in jj_observation["student_id"]:
         derived_session_rows.append(
           {
-            "true_week_ending": true_week_ending,
+            "_true_week_ending": _true_week_ending,
             "timestamp": jj_observation["observed_at"],
             "student_id": student_id,
-            "session_category": "Jiu-Jitsu",
+            "_session_category": "Jiu-Jitsu",
             "observation_context": "Jiu-Jitsu",
           }
         )
@@ -506,8 +506,8 @@ def inject_timestamp_skew(
     new_row = row.copy()
 
     if (
-      new_row["session_category"] == "Enrichment"
-      and new_row["true_week_ending"] in selected_week_endings
+      new_row["_session_category"] == "Enrichment"
+      and new_row["_true_week_ending"] in selected_week_endings
     ):
       new_row["timestamp"] += timedelta(days=7)
 

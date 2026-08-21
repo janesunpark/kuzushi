@@ -12,7 +12,7 @@ def assign_observer_id(
   for row in session_rows:
     new_row = row.copy()
 
-    if new_row["true_week_ending"] >= transition_week:
+    if new_row["_true_week_ending"] >= transition_week:
       new_row["observer_id"] = "T01"
     else: 
       new_row["observer_id"] = "T0"
@@ -41,11 +41,11 @@ def assign_observation_context(
   for row in session_rows:
     new_row = row.copy()
 
-    if new_row["session_category"] == "Enrichment":
+    if new_row["_session_category"] == "Enrichment":
       session_key = new_row["timestamp"]
 
       if session_key not in meeting_categories:
-        if new_row["true_week_ending"] >= cutoff_week:
+        if new_row["_true_week_ending"] >= cutoff_week:
           meeting_categories[session_key] = "Enrichment (Sibling Dyad)"
 
         else:
@@ -174,7 +174,7 @@ def assign_secondary_ratings(
   for row in session_rows:
     new_row = row.copy()
 
-    context = new_row["session_category"]
+    context = new_row["_session_category"]
     context_null_rates = null_rates[context]
 
     for domain, null_rate in context_null_rates.items():
@@ -216,7 +216,7 @@ def assign_deprecated_ratings(
 
   for row in session_rows:
     new_row = row.copy()
-    current_date = new_row["true_week_ending"]
+    current_date = new_row["_true_week_ending"]
 
     if current_date >= cutoff_week:
       for domain in null_rates:
@@ -257,15 +257,15 @@ def assign_pages_completed(
   for row in session_rows:
     new_row = row.copy()
 
-    if new_row["session_category"] == "Jiu-Jitsu":
+    if new_row["_session_category"] == "Jiu-Jitsu":
       new_row["Number of Pages Completed"] = None
 
     else:
-      if new_row["true_week_ending"] < cutoff_week:
+      if new_row["_true_week_ending"] < cutoff_week:
         new_row["Number of Pages Completed"] = None
 
       else:
-        current_week = new_row["true_week_ending"]
+        current_week = new_row["_true_week_ending"]
 
         progress = (
           (current_week - cutoff_week).days / 
@@ -317,7 +317,7 @@ def assign_task_difficulty(
 
     new_row["Task Difficulty or Novelty"] = None
 
-    if new_row["true_week_ending"] >= cutoff_week:
+    if new_row["_true_week_ending"] >= cutoff_week:
       student = new_row["student_id"]
 
       new_row["Task Difficulty or Novelty"] = int(
@@ -359,14 +359,14 @@ def assign_duration(
   for row in session_rows:
     new_row = row.copy()
 
-    if new_row["true_week_ending"] < cutoff_week:
+    if new_row["_true_week_ending"] < cutoff_week:
       new_row["Duration in Minutes"] = None
 
-    elif new_row["session_category"] == "Jiu-Jitsu":
+    elif new_row["_session_category"] == "Jiu-Jitsu":
       new_row["Duration in Minutes"] = 45
 
     else: 
-      if new_row["true_week_ending"] >= phase_shift_week:
+      if new_row["_true_week_ending"] >= phase_shift_week:
         distribution = late_duration_distribution
 
       else:
@@ -405,8 +405,8 @@ def assign_primary_task_type(
     new_row["Primary Task Type"] = None
 
     if (
-      new_row["true_week_ending"] >= cutoff_week
-      and new_row["session_category"] == "Enrichment"
+      new_row["_true_week_ending"] >= cutoff_week
+      and new_row["_session_category"] == "Enrichment"
     ):
       tasks = list(task_distribution.keys())
       weights = np.array(list(task_distribution.values()))
@@ -453,15 +453,15 @@ def assign_published_materials_used(
     new_row = row.copy()
 
     if (
-      new_row["true_week_ending"] < cutoff_week
-      or new_row["session_category"] != "Enrichment"
+      new_row["_true_week_ending"] < cutoff_week
+      or new_row["_session_category"] != "Enrichment"
     ):
       new_row["Published Materials Used"] = None
 
     else:
       weights = _find_phase(
         level_phases[new_row["student_id"]], 
-        new_row["true_week_ending"]
+        new_row["_true_week_ending"]
       )
 
       items = list(weights.keys())
@@ -565,15 +565,15 @@ def assign_puzzle_type(
     new_row["Puzzle Type"] = None
 
     if (
-      new_row["true_week_ending"] >= cutoff_week
-      and new_row["session_category"] == "Enrichment"
+      new_row["_true_week_ending"] >= cutoff_week
+      and new_row["_session_category"] == "Enrichment"
     ):
       student_id = new_row["student_id"]
       puzzles = item_distribution[student_id]["items"]
       weights = item_distribution[student_id]["weights"]
       weights = weights / weights.sum()
 
-      if new_row["true_week_ending"] < primary_task_type_cutoff_week:
+      if new_row["_true_week_ending"] < primary_task_type_cutoff_week:
         if rng.random() >= 0.5:
           new_row["Puzzle Type"] = str(rng.choice(puzzles, p=weights))
 
@@ -697,8 +697,8 @@ def assign_session_context_fields(
   for row in session_rows:
     new_row = row.copy()
 
-    if new_row["true_week_ending"] >= cutoff_week:
-      session_context = session_contexts[new_row["session_category"]]
+    if new_row["_true_week_ending"] >= cutoff_week:
+      session_context = session_contexts[new_row["_session_category"]]
 
       for domain, distribution in session_context.items():
 
@@ -938,7 +938,7 @@ def assign_notes(
   for row in session_rows:
     new_row = row.copy()
 
-    is_jj = row["session_category"] == "Jiu-Jitsu"
+    is_jj = row["_session_category"] == "Jiu-Jitsu"
 
     eligible = [
       name for name, theme in theme_bank.items()
@@ -981,6 +981,10 @@ def assign_notes(
       replace=False,
       p=weights
     )
+
+    new_row["_selected_notes_themes"] = [
+      str(t) for t in selected
+    ]
 
     bullets = []
     for theme_name in selected:

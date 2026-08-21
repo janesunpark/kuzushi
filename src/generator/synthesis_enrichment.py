@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from collections import Counter, defaultdict
 import numpy as np
 
 
@@ -52,3 +53,39 @@ def assign_jj_synthesis_fields(
     finalized_rows.append(new_row)
 
   return finalized_rows
+
+
+def summarize_weekly_notes_themes(
+    session_rows: list[dict],
+) -> tuple[dict[date, dict[str, Counter]], dict[date, dict[str, set]]]:
+
+  weekly_counts = defaultdict(lambda: defaultdict(Counter))
+  weekly_jj_themes = defaultdict(lambda: defaultdict(set))
+
+  for row in session_rows:
+    week = row["_true_week_ending"]
+    student = row["student_id"]
+    themes = row["_selected_notes_themes"]
+
+    if row["_session_category"] == "Enrichment":
+      weekly_counts[week][student].update(themes)
+
+    elif row["_session_category"] == "Jiu-Jitsu":
+      weekly_jj_themes[week][student].update(themes)
+
+    else:
+      raise ValueError(f"Unexpected _session_category: {row['_session_category']!r}")
+
+  weekly_counts = {
+    week: dict(students)
+    for week, students in weekly_counts.items()
+  }
+
+  weekly_jj_themes = {
+    week: dict(students)
+    for week, students in weekly_jj_themes.items()
+  }
+
+  return weekly_counts, weekly_jj_themes
+
+
