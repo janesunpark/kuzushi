@@ -87,5 +87,3 @@ def summarize_weekly_notes_themes(
   }
 
   return weekly_counts, weekly_jj_themes
-
-
