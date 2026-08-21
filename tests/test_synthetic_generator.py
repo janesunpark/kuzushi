@@ -94,7 +94,7 @@ def test_observer_id_shifts_at_transition_week():
   rows1 = sg.assign_observer_id(session_rows, transition_week)
 
   for row in rows1:
-    if row["true_week_ending"] < transition_week:
+    if row["_true_week_ending"] < transition_week:
       assert row["observer_id"] == "T0"
     else:
       assert row["observer_id"] == "T01"
@@ -146,7 +146,7 @@ def test_enrichment_rows_from_same_meeting_share_context():
   contexts_by_timestamp = {}
 
   for row in assigned_rows:
-    if row["session_category"] == "Jiu-Jitsu":
+    if row["_session_category"] == "Jiu-Jitsu":
       continue
 
     timestamp = row["timestamp"]
@@ -162,7 +162,7 @@ def test_enrichment_rows_from_same_meeting_share_context():
   )
 
 
-def test_assign_observation_context_preserves_session_category():
+def test_assign_observation_context_preserves__session_category():
   rng = sg._generate_rng(42)
 
   session_rows = sg.derive_session_rows(
@@ -176,8 +176,8 @@ def test_assign_observation_context_preserves_session_category():
   )
 
   for original, assigned in zip(session_rows, assigned_rows):
-    if original["session_category"] == "Jiu-Jitsu":
-      assert assigned["session_category"] == "Jiu-Jitsu"
+    if original["_session_category"] == "Jiu-Jitsu":
+      assert assigned["_session_category"] == "Jiu-Jitsu"
 
 
 def test_assign_observation_context_preserves_jiu_jitsu_context():
@@ -194,7 +194,7 @@ def test_assign_observation_context_preserves_jiu_jitsu_context():
   )
 
   for original, assigned in zip(session_rows, assigned_rows):
-    if original["session_category"] == "Jiu-Jitsu":
+    if original["_session_category"] == "Jiu-Jitsu":
       assert(
         assigned["observation_context"] == "Jiu-Jitsu"
       )
@@ -328,7 +328,7 @@ def test_assign_core_ratings_preserves_existing_columns():
   for original, assigned in zip(session_rows, assigned_rows):
     assert original["student_id"] == assigned["student_id"]
     assert original["timestamp"] == assigned["timestamp"]
-    assert original["session_category"] == assigned["session_category"]
+    assert original["_session_category"] == assigned["_session_category"]
     assert original["observation_context"] == assigned["observation_context"]
 
 
@@ -353,7 +353,7 @@ def test_observation_context_boundary_week_is_fully_new():
     date(2026, 1, 25)
     )
 
-  boundary = [r for r in rows if r["true_week_ending"] == date(2026, 1, 25) and r["session_category"] == "Enrichment"]
+  boundary = [r for r in rows if r["_true_week_ending"] == date(2026, 1, 25) and r["_session_category"] == "Enrichment"]
 
   assert boundary
   assert all(r["observation_context"] == "Enrichment (Sibling Dyad)" for r in boundary)
@@ -372,7 +372,7 @@ def test_deprecated_ratings_boundary_week_is_fully_null():
     date(2026, 1, 25)
     )
 
-  boundary = [r for r in rows if r["true_week_ending"] == date(2026, 1, 25)]
+  boundary = [r for r in rows if r["_true_week_ending"] == date(2026, 1, 25)]
 
   assert boundary
   assert all(r["Coordination and Motor Skills"] is None 
@@ -392,8 +392,8 @@ def test_pages_completed_boundary_week_is_already_active():
     date(2025, 12, 7)
     )
 
-  boundary = [r for r in rows if r["true_week_ending"] == date(2025, 12, 7) 
-              and r["session_category"] == "Enrichment"]
+  boundary = [r for r in rows if r["_true_week_ending"] == date(2025, 12, 7) 
+              and r["_session_category"] == "Enrichment"]
 
   assert boundary
   assert any(r["Number of Pages Completed"] is not None for r in boundary)
