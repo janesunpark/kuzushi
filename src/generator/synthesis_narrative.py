@@ -46,6 +46,17 @@ FRAMING_CLAUSES = {
 
 JJ_ADDENDUM = ", a behavior also noted during this week's Jiu-Jitsu observation, though still treated as a preliminary, single-week signal across contexts rather than confirmed transfer"
 
+CONNECTOR_PHRASES = {
+  "connector": ["Specifically,", "For example,", "For instance,"]
+}
+
+
+def _first_known_theme(entries):
+  for entry in entries:
+    if entry[0] in THEME_PHRASES:
+      return entry
+  return None
+
 
 def _select_weekly_narrative_themes(
     week_enrichment_counts: dict[str, Counter],
@@ -115,3 +126,91 @@ def _build_shift_bullet(
     bullet += JJ_ADDENDUM
 
   return bullet + "."
+
+
+def _build_snapshot(
+    rng: np.random.Generator,
+    selection: dict,
+) -> str:
+
+  candidates = []
+
+  all_themes = selection["all_themes"]
+
+  for bucket_type, entries in all_themes.items():
+    for theme, score, has_jj in entries:
+      candidates.append(
+        (theme, bucket_type, score, has_jj)
+      )
+
+  known_candidates = [
+    entry
+    for entry in candidates
+    if entry[0] in THEME_PHRASES
+  ]
+
+  if not known_candidates:
+    return ""
+
+  def _priority_key(entry):
+    theme, bucket_type, score, has_jj = entry
+    return (score, bucket_type == "cross_learner")
+
+  winning_theme, winning_bucket_type, _, _ = max(
+    known_candidates,
+    key=_priority_key
+  )
+
+  if winning_bucket_type == "cross_learner":
+    phrase_type = "cross_learner"
+    student = None
+  else:
+    phrase_type = "individual"
+    student = winning_bucket_type.split("_")[0]
+
+  phrase = THEME_PHRASES[winning_theme][phrase_type]
+
+  if student is not None:
+    phrase = phrase.format(student=student)
+
+  first_sentence = f"{phrase[0].upper()}{phrase[1:]}"
+
+  s01_theme = _first_known_theme(
+    all_themes["S01_individual"]
+  )
+  s02_theme = _first_known_theme(
+    all_themes["S02_individual"]
+  )
+
+  individual_sentences = []
+
+  if s01_theme is not None and s01_theme[0] != winning_theme:
+    s01_sentence = THEME_PHRASES[s01_theme[0]]["individual"]
+    s01_sentence = s01_sentence.format(student="S01")
+    individual_sentences.append(s01_sentence)
+
+  if s02_theme is not None and s02_theme[0] != winning_theme:
+    s02_sentence = THEME_PHRASES[s02_theme[0]]["individual"]
+    s02_sentence = s02_sentence.format(student="S02")
+    individual_sentences.append(s02_sentence)
+
+  sentences = [first_sentence]
+
+  if individual_sentences:
+    connector = rng.choice(
+      CONNECTOR_PHRASES["connector"]
+    )
+
+    if len(individual_sentences) == 1:
+      sentences.append(
+        f"{connector} {individual_sentences[0]}"
+      )
+    else:
+      sentences.append(
+        f"{connector} {individual_sentences[0]}, while {individual_sentences[1]}"
+      )
+
+  return " ".join(
+    f"{sentence}." if not sentence.endswith(".") else sentence
+    for sentence in sentences
+  )
