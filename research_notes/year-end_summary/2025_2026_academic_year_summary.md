@@ -111,15 +111,3 @@ A number of exploratory research questions were distilled from this observation 
 * How do spatial puzzles and structured play support early mathematical reasoning, including pattern recognition, part-whole thinking, and movement from concrete application toward early abstraction? 
 
 * How do different levels of challenge, pressure, and teacher support affect strategy selection and recovery after difficulty? 
-
-
-
-
-
-
-
-
-
-
-
-
