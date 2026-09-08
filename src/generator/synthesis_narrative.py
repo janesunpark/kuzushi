@@ -20,7 +20,7 @@ THEME_PHRASES = {
     "cross_learner": "both learners showed sustained engagement this week, with attention holding through longer stretches of task time",
   },
   "motivat": {
-    "individual": "{student} stayed motivated to take on additional work, despite it being more challenging",
+    "individual": "{student} stayed motivated to take on additional work despite it being more challenging",
     "cross_learner": "both learners showed increased participation in response to external sources of motivation, such as visible markers of achievement and prizes",
   },
   "structure": {
@@ -44,16 +44,46 @@ FRAMING_CLAUSES = {
   ],
 }
 
-JJ_ADDENDUM = ", a behavior also noted during this week's Jiu-Jitsu observation, though still treated as a preliminary, single-week signal across contexts rather than confirmed transfer"
+JJ_ADDENDUM = "This is a behavior also noted during this week's Jiu-Jitsu observation, though still treated as a preliminary, single-week signal across contexts rather than confirmed transfer"
 
 CONNECTOR_PHRASES = {
   "connector": ["Specifically,", "For example,", "For instance,"]
 }
 
+LEARNING_MECHANISM_PHRASES = {
+  "familiar": {
+    "individual": "{student}'s learning mechanism relied on familiar visual cues and working around them, suggesting that familiarity can serve as a strategic entry point in problem-solving",
+    "cross_learner": "Both learners appeared to rely on familiar problem-solving approaches, particularly in unfamiliar contexts. This suggests a developing strategy that stems from recognizing familiar shapes and constraints",
+  },
+  "flexib": {
+    "individual": "{student} showed improved cognitive flexibility, suggesting growing openness toward strategic adjustments mid-task",
+    "cross_learner": "Both learners showed flexible reasoning by maneuvering a step that they found challenging in prior sessions, suggesting greater flexibility in problem-solving contexts",
+  },
+  "independen": {
+    "individual": "{student} showed a preference for independent exploration of concepts, suggesting a growing sense of autonomy",
+    "cross_learner": "Both learners completed tasks independently across a variety of materials and challenge levels. Prior success in independent task completion appears to support confidence, initiative, and willingness to follow through on increasingly challenging tasks",
+  },
+  "engag": {
+    "individual": "{student} showed stable session flow from worksheet engagement to play, suggesting that engagement level in one task type does not necessarily impede engagement in another",
+    "cross_learner": "Both learners preferred different approaches to task engagement, suggesting that learner-specific pathways may impact individual patterns of engagement",
+  },
+  "motivat": {
+    "individual": "{student} showed competitive motivation, suggesting that comparison dynamics may encourage task completion",
+    "cross_learner": "Both learners showed sensitivity toward different motivational markers, suggesting that unique motivational preferences may contribute to learner-specific pathways",
+  },
+  "structure": {
+    "individual": "{student} sought creative problem-solving approaches within structured materials, suggesting that appropriate, skill-based structure can provide opportunities for exploratory learning",
+    "cross_learner": "Both learners spontaneously extended learned structures, suggesting a growing interest in exploratory application",
+  },
+  "spatial_pattern": {
+    "individual": "{student} recognized recurring patterns across puzzle sets, suggesting a recognition of geometric pattern equivalence across different spatial contexts",
+    "cross_learner": "Both learners approached spatial matching tasks by relying on prior successful patterns, even in tasks that were more challenging. This suggests growing confidence and spatial awareness",
+  },
+}
 
-def _first_known_theme(entries):
+def _first_known_theme(entries, phrase_bank):
   for entry in entries:
-    if entry[0] in THEME_PHRASES:
+    if entry[0] in phrase_bank:
       return entry
   return None
 
@@ -123,9 +153,9 @@ def _build_shift_bullet(
 
   bullet = f"{phrase[0].upper()}{phrase[1:]}, {framing}"
   if has_jj:
-    bullet += JJ_ADDENDUM
+    bullet += ". " + JJ_ADDENDUM
 
-  return bullet + "."
+  return "* " + bullet + "."
 
 
 def _build_snapshot(
@@ -176,41 +206,84 @@ def _build_snapshot(
   first_sentence = f"{phrase[0].upper()}{phrase[1:]}"
 
   s01_theme = _first_known_theme(
-    all_themes["S01_individual"]
+    all_themes["S01_individual"], 
+    THEME_PHRASES
   )
   s02_theme = _first_known_theme(
-    all_themes["S02_individual"]
+    all_themes["S02_individual"],
+    THEME_PHRASES
   )
 
-  individual_sentences = []
+  individual_bullets = []
 
   if s01_theme is not None and s01_theme[0] != winning_theme:
-    s01_sentence = THEME_PHRASES[s01_theme[0]]["individual"]
-    s01_sentence = s01_sentence.format(student="S01")
-    individual_sentences.append(s01_sentence)
+    s01_bullet = THEME_PHRASES[s01_theme[0]]["individual"]
+    s01_bullet = s01_bullet.format(student="S01")
+    individual_bullets.append(s01_bullet)
 
   if s02_theme is not None and s02_theme[0] != winning_theme:
-    s02_sentence = THEME_PHRASES[s02_theme[0]]["individual"]
-    s02_sentence = s02_sentence.format(student="S02")
-    individual_sentences.append(s02_sentence)
+    s02_bullet = THEME_PHRASES[s02_theme[0]]["individual"]
+    s02_bullet = s02_bullet.format(student="S02")
+    individual_bullets.append(s02_bullet)
 
-  sentences = [first_sentence]
+  bullets = [first_sentence]
 
-  if individual_sentences:
+  if individual_bullets:
     connector = rng.choice(
       CONNECTOR_PHRASES["connector"]
     )
 
-    if len(individual_sentences) == 1:
-      sentences.append(
-        f"{connector} {individual_sentences[0]}"
+    if len(individual_bullets) == 1:
+      bullets.append(
+        f"{connector} {individual_bullets[0]}"
       )
     else:
-      sentences.append(
-        f"{connector} {individual_sentences[0]}, while {individual_sentences[1]}"
+      bullets.append(
+        f"{connector} {individual_bullets[0]}, while {individual_bullets[1]}"
       )
 
   return " ".join(
     f"{sentence}." if not sentence.endswith(".") else sentence
-    for sentence in sentences
+    for sentence in bullets
   )
+
+
+def _build_learning_mechanism(
+    rng: np.random.Generator,
+    selection: dict,
+) -> str:
+
+  all_themes = selection["all_themes"]
+
+  s01_theme = _first_known_theme(
+    all_themes["S01_individual"],
+    LEARNING_MECHANISM_PHRASES
+  )
+  s02_theme = _first_known_theme(
+    all_themes["S02_individual"],
+    LEARNING_MECHANISM_PHRASES
+  )
+  cross_theme = _first_known_theme(
+    all_themes["cross_learner"],
+    LEARNING_MECHANISM_PHRASES
+  )
+
+  bullets = []
+
+  if s01_theme is not None:
+    s01_bullet = LEARNING_MECHANISM_PHRASES[s01_theme[0]]["individual"]
+    s01_bullet = s01_bullet.format(student="S01")
+    bullets.append(s01_bullet)
+
+  if s02_theme is not None:
+    s02_bullet = LEARNING_MECHANISM_PHRASES[s02_theme[0]]["individual"]
+    s02_bullet = s02_bullet.format(student="S02")
+    bullets.append(s02_bullet)
+
+  if cross_theme is not None:
+    cross_learner_bullet = LEARNING_MECHANISM_PHRASES[cross_theme[0]]["cross_learner"] 
+    bullets.append(cross_learner_bullet)
+
+  if not bullets:
+    return ""
+  return "* " + "\n* ".join([item + "." for item in bullets])
