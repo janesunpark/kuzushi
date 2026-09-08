@@ -1,7 +1,12 @@
 from collections import Counter
 import numpy as np
 
-from src.generator.synthesis_narrative import _select_weekly_narrative_themes, _build_snapshot
+from src.generator.synthesis_narrative import (
+  _select_weekly_narrative_themes, 
+  _build_snapshot, 
+  _build_shift_bullet, 
+  _build_learning_mechanism
+)
 
 def inspect_weekly_narrative(selection):
   print("=" * 60)
@@ -63,3 +68,41 @@ print("-" * 60)
 snapshot = _build_snapshot(rng, selection)
 
 print(snapshot)
+
+print("\n" + "-" * 60)
+print("NOTABLE SHIFTS OR CONFIRMATIONS")
+print("-" * 60)
+
+week_top_score = max(
+  entry[1]
+  for entries in selection["all_themes"].values()
+  for entry in entries
+)
+
+for student in ["S01", "S02"]:
+  entries = selection["all_themes"][f"{student}_individual"]
+
+  if not entries:
+    continue
+
+  theme, score, has_jj = entries[0]
+
+  notable_shift = _build_shift_bullet(
+    rng,
+    theme=theme,
+    score=score,
+    has_jj=has_jj,
+    bucket_type="individual",
+    week_top_score=week_top_score,
+    student=student,
+  )
+
+  print(notable_shift)
+
+print("\n" + "-" * 60)
+print("LEARNING MECHANISMS OBSERVED")
+print("-" * 60)
+
+learning_mechanisms = _build_learning_mechanism(rng, selection)
+
+print(learning_mechanisms)
