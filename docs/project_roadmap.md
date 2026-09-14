@@ -43,7 +43,7 @@ Observation-focused questions include:
 
 * How do learner-specific problem-solving pathways develop over them?
 * How do learners use familiar strategies when task demands increase? 
-* When do familiarity support flexibility, and when does it become limiting?
+* When does familiarity support flexibility, and when does it become limiting?
 * How do regulation and co-regulation patterns affect task persistence and recovery after difficulty?
 * Do similar problem-solving patterns appear across academic, spatial, game-based, and embodied contexts? 
 
