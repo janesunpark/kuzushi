@@ -72,7 +72,7 @@ kuzushi/
 ├── requirements.txt         # Python dependencies for analysis scripts and notebooks
 ├── docs/                    # Methodology, ethics, observation framework, and roadmap
 ├── research_notes/          # Public-facing school-year summaries and Weekly Research Notes
-├── data/                    # Raw data and pipeline snapshots used for development and testing
+├── data/                    # Data and pipeline snapshots used for development and testing
 ├── data_schema/             # Planned derived data schema, codebook, and sample anonymized structures
 ├── notebooks/               # Future exploratory analysis notebooks
 ├── tests/                   # Automated tests for pipeline behavior
