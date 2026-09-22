@@ -53,7 +53,7 @@ CONNECTOR_PHRASES = {
 LEARNING_MECHANISM_PHRASES = {
   "familiar": {
     "individual": "{student}'s learning mechanism relied on familiar visual cues and working around them, suggesting that familiarity can serve as a strategic entry point in problem-solving",
-    "cross_learner": "Both learners appeared to rely on familiar problem-solving approaches, particularly in unfamiliar contexts. This suggests a developing strategy that stems from recognizing familiar shapes and constraints",
+    "cross_learner": "Both learners appeared to rely on familiar problem-solving approaches, particularly in unfamiliar tasks. This suggests a developing strategy that stems from recognizing familiar patterns and constraints",
   },
   "flexib": {
     "individual": "{student} showed improved cognitive flexibility, suggesting growing openness toward strategic adjustments mid-task",
@@ -78,6 +78,53 @@ LEARNING_MECHANISM_PHRASES = {
   "spatial_pattern": {
     "individual": "{student} recognized recurring patterns across puzzle sets, suggesting a recognition of geometric pattern equivalence across different spatial contexts",
     "cross_learner": "Both learners approached spatial matching tasks by relying on prior successful patterns, even in tasks that were more challenging. This suggests growing confidence and spatial awareness",
+  },
+  "reward": {
+    "individual": "{student} showed a strong response to visible reward markers, suggesting that external incentives may currently play a meaningful role in sustaining task effort",
+    "cross_learner": "Both learners responded to different reward systems, suggesting that reward sensitivity may itself be a learner-specific pathway rather than a shared mechanism",
+  },
+  "scaffold": {
+    "individual": "{student} relied on a scaffolded starting point before continuing independently, suggesting that structured support at the outset can free up capacity for independent problem-solving later in a task",
+    "cross_learner": "Both learners made use of scaffolded starting points differently, suggesting that the amount of initial support each benefits from may vary by learner",
+  },
+}
+
+DATA_FLAG_PHRASES = {
+  "familiar": {
+    "individual": "Observe whether {student} continues to rely on familiar entry points as task difficulty increases, or begins initiating less familiar approaches independently",
+    "cross_learner": "Continue monitoring how each learner's use of familiar strategies evolves, given that both currently anchor to different kinds of familiarity",
+  },
+  "flexib": {
+    "individual": "Track whether specific tasks promote abstraction flexibility for {student}",
+    "cross_learner": "Observe if flexible transfer of strategies appears across different task types for both learners",
+  },
+  "independen": {
+    "individual": "Continue monitoring whether {student} chooses to complete tasks independently",
+    "cross_learner": "Track if either learner prefers to complete specific types of tasks independently",
+  },
+  "engag": {
+    "individual": "Track how long it takes for {student} to re-engage and resume task",
+    "cross_learner": "Continue monitoring if sustained engagement patterns persist when worksheet tasks are followed by play time",
+  },
+  "motivat": {
+    "individual": "Track different contributing factors to {student}'s motivation",
+    "cross_learner": "Observe whether both learners show signs of developing intrinsic motivation",
+  },
+  "structure": {
+    "individual": "Observe how task structure appears to influence {student}'s conceptual consolidation",
+    "cross_learner": "Observe whether individual preference for specific task structure is connected to learner-specific pathways",
+  },
+  "spatial_pattern": {
+    "individual": "Track {student}'s problem-solving patterns and geometric discrimination in spatial tasks",
+    "cross_learner": "Continue monitoring both learners' spatial reasoning and pattern detection across different task forms"
+  },
+  "reward": {
+    "individual": "Continue monitoring {student}'s response to reward systems",
+    "cross_learner": "Track if individual learner response to reward changes depending on context, such as perceived cost of effort, inclination toward play, and perceived task difficulty",
+  },
+  "scaffold": {
+    "individual": "Observe if {student} recalls a specific strategy in a similarly constrained, scaffolded problem",
+    "cross_learner": "Continue observing how scaffolded approaches contribute to task completion and learner confidence",
   },
 }
 
@@ -155,7 +202,7 @@ def _build_shift_bullet(
   if has_jj:
     bullet += ". " + JJ_ADDENDUM
 
-  return "* " + bullet + "."
+  return bullet + "."
 
 
 def _build_snapshot(
@@ -214,42 +261,41 @@ def _build_snapshot(
     THEME_PHRASES
   )
 
-  individual_bullets = []
+  individual_sentences = []
 
   if s01_theme is not None and s01_theme[0] != winning_theme:
-    s01_bullet = THEME_PHRASES[s01_theme[0]]["individual"]
-    s01_bullet = s01_bullet.format(student="S01")
-    individual_bullets.append(s01_bullet)
+    s01_sentence = THEME_PHRASES[s01_theme[0]]["individual"]
+    s01_sentence = s01_sentence.format(student="S01")
+    individual_sentences.append(s01_sentence)
 
   if s02_theme is not None and s02_theme[0] != winning_theme:
-    s02_bullet = THEME_PHRASES[s02_theme[0]]["individual"]
-    s02_bullet = s02_bullet.format(student="S02")
-    individual_bullets.append(s02_bullet)
+    s02_sentence = THEME_PHRASES[s02_theme[0]]["individual"]
+    s02_sentence = s02_sentence.format(student="S02")
+    individual_sentences.append(s02_sentence)
 
-  bullets = [first_sentence]
+  sentences = [first_sentence]
 
-  if individual_bullets:
+  if individual_sentences:
     connector = rng.choice(
       CONNECTOR_PHRASES["connector"]
     )
 
-    if len(individual_bullets) == 1:
-      bullets.append(
-        f"{connector} {individual_bullets[0]}"
+    if len(individual_sentences) == 1:
+      sentences.append(
+        f"{connector} {individual_sentences[0]}"
       )
     else:
-      bullets.append(
-        f"{connector} {individual_bullets[0]}, while {individual_bullets[1]}"
+      sentences.append(
+        f"{connector} {individual_sentences[0]}, while {individual_sentences[1]}"
       )
 
   return " ".join(
     f"{sentence}." if not sentence.endswith(".") else sentence
-    for sentence in bullets
+    for sentence in sentences
   )
 
 
 def _build_learning_mechanism(
-    rng: np.random.Generator,
     selection: dict,
 ) -> str:
 
@@ -282,6 +328,46 @@ def _build_learning_mechanism(
 
   if cross_theme is not None:
     cross_learner_bullet = LEARNING_MECHANISM_PHRASES[cross_theme[0]]["cross_learner"] 
+    bullets.append(cross_learner_bullet)
+
+  if not bullets:
+    return ""
+  return "* " + "\n* ".join([item + "." for item in bullets])
+
+
+def _build_data_flags(
+    selection: dict,
+) -> str:
+
+  all_themes = selection["all_themes"]
+
+  s01_theme = _first_known_theme(
+    all_themes["S01_individual"],
+    DATA_FLAG_PHRASES
+  )
+  s02_theme = _first_known_theme(
+    all_themes["S02_individual"],
+    DATA_FLAG_PHRASES
+  )
+  cross_theme = _first_known_theme(
+    all_themes["cross_learner"],
+    DATA_FLAG_PHRASES
+  )
+
+  bullets = []
+
+  if s01_theme is not None:
+    s01_bullet = DATA_FLAG_PHRASES[s01_theme[0]]["individual"]
+    s01_bullet = s01_bullet.format(student="S01")
+    bullets.append(s01_bullet)
+
+  if s02_theme is not None:
+    s02_bullet = DATA_FLAG_PHRASES[s02_theme[0]]["individual"]
+    s02_bullet = s02_bullet.format(student="S02")
+    bullets.append(s02_bullet)
+
+  if cross_theme is not None:
+    cross_learner_bullet = DATA_FLAG_PHRASES[cross_theme[0]]["cross_learner"]
     bullets.append(cross_learner_bullet)
 
   if not bullets:
