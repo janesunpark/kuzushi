@@ -495,3 +495,186 @@ Option 2 and option 4.
 - A real, scoped design decision on null-handling style: whether to fold `None` directly into a weighted-choice array or keep the separate-`is_null`-then-branch pattern used elsewhere. Kept the combined form for these two fields specifically (few total outcomes, null genuinely being just one more simple option among them), explicitly not generalized to every field, since most fields' null-rate and value-distribution answer different real-world questions that benefit from staying separately calibrated.
 - `Private Lessons` was flagged as a genuinely different category of data-quality concern from anything else in this project — not a small-sample-size confidence question, but secondhand information (parental report) that was never directly, weekly-verified the way every other observed field was. Flagged explicitly as a Silver/Gold-layer exclusion candidate rather than left to blend in with the rest of the dataset's implied trustworthiness.
 - Final verification, 100 seeds: zero violations across every boundary and dependency check, both distributions within a point of their real targets.
+
+## Milestone 19 — Theme-visibility plumbing and one shared selection layer for the narrative fields
+
+*Internal cross-reference: blueprint Entries 53–54. See also Patterns Journal, "Independent projections at the grain each consumer needs."*
+
+**Problem**
+
+The weekly synthesis log's four narrative fields should reflect what that week's session notes actually recorded. Nothing in the generator connected the two: `assign_notes` rendered text and discarded which themes it had drawn, and synthesis rows were built from the schedule with no visibility into session content. This would be the first cross-row dependency in the entire generator.
+
+**Options considered**
+
+1. Handle week-to-session coherence in the Silver layer, where cross-row work lives.
+2. Handle it in Bronze: expose the drawn themes from `assign_notes`, aggregate them per week, and let each of the four narrative fields pick its own themes from that aggregate.
+3. Same as 2, but with one shared selection layer feeding all four fields.
+4. Pass the aggregate between functions as a temp file, so it survives across runs.
+
+**Chosen solution**
+
+Option 3, in memory.
+
+**Trade-offs**
+
+- Option 1 misread Silver's scope. Silver restructures existing content; it does not generate new relationships between rows. That was a correction to an earlier framing that treated the two as architecturally equal.
+- Option 2 would have made the plumbing pointless: four independently-themed fields tie nothing to the same week. The shared layer is what makes the effort pay off.
+- Option 4 reintroduces the partial-write risk the Bronze loader's atomicity work exists to prevent, for nothing that needs to persist.
+- The aggregation was split twice, and both were real decisions rather than caveats: per-student rather than pooled (the real year-end summary has distinct per-student and cross-learner sections a pooled count cannot support), and Enrichment separate from Jiu-Jitsu (the real methodology assigns JJ-sourced patterns categorically less weight; a blended count would erase that).
+- The selection layer ranks a shared theme by the *minimum* of the two students' counts, not the sum, so one student cannot carry a "shared" theme alone. JJ presence breaks ties but never overrides a score lead.
+- Two bugs sat in the individual-theme branches and stayed invisible while every early test week happened to produce only shared themes. Verified afterwards across 1,950 generated weeks with zero mismatches.
+
+## Milestone 20 — The first narrative field: templated construction, and three rounds of learning what a phrase bank must satisfy
+
+*Internal cross-reference: blueprint Entry 55. See also Patterns Journal, "A correctly-calibrated selection mechanism doesn't guarantee the generated content carries the measurable signal."*
+
+**Problem**
+
+`Notable Shifts or Confirmations` needed generated prose that reads as analytical observation, varies by week, carries each theme's keyword so a downstream frequency check can find it, and distinguishes "confirmed" from "emerging" without the generator tracking real week-over-week change.
+
+**Options considered**
+
+1. Independent fragment banks, as `Notes` uses — fully-formed sentences, sampled.
+2. Templated construction: a shared skeleton with theme phrases, a framing clause, and an optional cross-context addendum filled in.
+3. Track real week-over-week change inside the generator so "shift" and "confirmation" are factual.
+
+**Chosen solution**
+
+Option 2, with the shift/confirmation distinction tied to signal strength *within* the week (relative to the week's top score, with a fixed floor) rather than to real change.
+
+**Trade-offs**
+
+- Option 1 multiplies out to roughly two dozen distinct pieces of prose for one field; the real field's language is formulaic enough that a skeleton fits it better than it would fit `Notes`.
+- Option 3 simulates a capability the real pipeline gets for free once Silver and Gold exist against real history. Single-week scope at Bronze; language that gestures at continuity, the same trick `Notes` already uses.
+- A pure relative-to-max threshold was rejected: a flat week would manufacture a "confirmed" theme by construction.
+- Templating has a cost independent fragments never had. Three review rounds found, in order: conceptual drift (one theme's phrasing described a different theme), five of fourteen phrases losing their keyword *during* readability edits, and shared boilerplate — the word "pattern" in framing clauses — contaminating one theme's keyword signal in roughly half of all bullets regardless of theme. The last is a new failure category: an independent fragment either contains its keyword or doesn't; boilerplate is inherited by every output.
+- Verified across 6,016 generated bullets: none missing its keyword, none contaminated.
+
+## Milestone 21 — `Snapshot`: an 82% crash rate, and a tie-break that was right by accident in half of all weeks
+
+*Internal cross-reference: blueprint Entry 56. See also Patterns Journal, "Correct by coincidence, not by construction" and "Bugs only findable by running the code, not reading it."*
+
+**Problem**
+
+`Snapshot` is short overview prose. The real field varies in shape from row to row and sometimes names specific materials. Its builder consumes the same selection layer as `Notable Shifts` — a layer deliberately kept field-agnostic, which turned out to have a downstream cost.
+
+**Options considered**
+
+1. Model the real field's structural variety by randomly choosing among several templates per week; carry material names through a second plumbing pipeline.
+2. Standardize on one two-sentence shape; skip material naming; reuse the existing phrase bank.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- The field's job is a brief overview; analytical weight sits elsewhere. Standardizing costs nothing that matters and avoids a second pipeline for a pattern only some real rows show.
+- The first draft crashed on 32 of 39 real weeks. The selection layer returns every theme `Notes` can draw, including flavor themes no phrase bank renders; the builder took the highest score unfiltered and indexed the first entry of buckets that could be empty. One helper — first entry actually present in the bank, or none — fixed both, and the measured rate matters more than the fix: this was the dominant outcome, not an edge case.
+- The cross-learner tie-break worked only because of dict insertion order. Checked: 1,002 of 1,950 weeks have a genuine top-score tie. A coincidence was deciding the majority of all weeks. Made explicit; verified 1,002 of 1,002 now resolve by rule. Correct output is not the same as correct code.
+- Prose can't be eyeballed the way row dicts can, so an inspection script was built for this layer — the right instinct, and the same one that made the session-row work tractable. Its one bug was an import that only worked under an ad hoc invocation.
+
+## Milestone 22 — `Learning Mechanisms Observed`: a helper hardcoded to the wrong bank, and what a truncated theme name is actually for
+
+*Internal cross-reference: blueprint Entry 57. See also Patterns Journal, "The key is a contract with the producer."*
+
+**Problem**
+
+This field's real register is mechanism-level and its bullets share one shape — observation, then "suggesting…", then interpretation — so it needed its own phrase bank. It also reuses the helper written for `Snapshot`, which was about to be used against a different bank than the one it was written against.
+
+**Options considered**
+
+1. Reuse `THEME_PHRASES` with lighter framing, as `Snapshot` did.
+2. Author a dedicated bank with the observation-then-interpretation structure built into every phrase.
+3. For the shared helper: leave it checking the original bank, since both banks happen to have the same seven themes today.
+4. Make the bank a parameter.
+
+**Chosen solution**
+
+Options 2 and 4.
+
+**Trade-offs**
+
+- Option 1 would have been `Notable Shifts`' language wearing a different hat.
+- Option 3 works today and fails silently the day the banks diverge — in either direction: filtering out a usable theme, or passing one through to a `KeyError`. The second occurrence of "correct by coincidence" in two milestones.
+- Bullet count standardized at 3, which is both the real mean and the real mode. One bullet per bucket meant the existing helper served as-is; no generalization needed.
+- A dict key had been shortened to `"structur"` to cover "structure" and "structural." The key must match exactly what the pipeline produces — `"structure"` — or the lookup raises on a common theme. The stem belongs at verification time, as the substring a keyword audit searches for, where it correctly catches both forms. The follow-up question — isn't `"independen"` the same thing? — sharpened the rule: that *is* the theme's canonical name, chosen at the start; the test is whether the key matches the producer, not whether the string is shorter than a word.
+- Content review caught one phrase reproducing a real sentence too closely; rewritten until only a short generic phrase remained shared. Verified: 1,684 bullets, all carrying the correct keyword; zero crashes across 1,950 weeks.
+
+## Milestone 23 — Deciding what the generator will not model
+
+*Internal cross-reference: blueprint Entry 58; `methodology_log.md`, 2026-09-17.*
+
+**Problem**
+
+Two real, prominent patterns had no home in the generator: co-regulation with a trusted adult (recurring across every real synthesis field, Established in the project's terminology) and the `reward` / `scaffold` themes (real and frequent, but uncorrelated with any rating and absent from every phrase bank). Leaving them out risked a synthetic dataset that misrepresented the real one; adding them risked rebuilding foundational layers late.
+
+**Options considered**
+
+1. Add co-regulation as a twelfth theme in `Notes`, so every downstream field could carry it.
+2. Add a co-regulation addendum clause, fired on a fixed probability, to whichever theme's bullet it attaches to.
+3. Leave co-regulation unmodeled and document it as a limitation.
+4. Retrofit `reward` and `scaffold` into every phrase bank.
+5. Retrofit them into the two single-purpose banks only, leaving the shared bank that two fields depend on untouched.
+
+**Chosen solution**
+
+Options 3 and 5.
+
+**Trade-offs**
+
+- Option 1 is not a retrofit; it is redoing the theme-design process — correlated or flavor, fragments in two variants, keyword audit, cross-context plausibility — for one concept, with every downstream field inheriting the risk. And co-regulation may not fit the mechanism regardless of effort: it is a relationship between an event and a support, not a single observable behavior, which is why real text uses it as a modifier rather than a subject.
+- Option 2 would be the first ungrounded probability in a generator otherwise anchored to real frequencies everywhere. No structured signal exists to condition it on.
+- Option 3's honesty is the point: the fix belongs at the source. The redesigned 2026–27 observation form adds a structured support-type field. The gap closes in real data, not in synthetic data.
+- Option 4 touches shared infrastructure two verified fields depend on, at the full cost of three review rounds per bank. Option 5 gets two fields corroborating the themes at roughly a third of that cost. The remaining asymmetry — a theme flagged as worth watching without appearing in that week's retrospective fields — is what a prospective field looks like, not falsification.
+- Implementation of option 5 is pending and will be logged with the last narrative field.
+
+## Milestone 24 — A silent contract drift, caught by simulating a consumer that doesn't exist yet
+
+*Internal cross-reference: blueprint Entry 59. See also Patterns Journal, "Verify against the next consumer, not just the current one."*
+
+**Problem**
+
+Two sibling functions — `_build_shift_bullet` and `_build_learning_mechanism` — need to agree on who formats a bullet marker, since a future orchestrating function will eventually call both and join their results into single field values. A wording change to a shared addendum string prompted a matching code change to one of the two functions, and that change happened to also add its own `"* "` prefix directly into the return value — breaking from the other function's established convention without anything flagging it.
+
+**Options considered**
+
+1. Trust the existing inspection script's output as sufficient verification, since it already prints both fields and both look correct.
+2. Simulate how a real orchestrating function would actually assemble the field — collecting multiple bullet results and joining them into one string — even though that function doesn't exist yet.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 would have missed this entirely. The inspection script prints each bullet with a separate `print()` call; Python supplies the newline between them. That never exercises actual string concatenation, so a `"* "` baked into every individual result looks identical to one added once at the join point — right up until something tries to join multiple results the way the field's real value has to be assembled.
+- Option 2 required writing code that doesn't correspond to anything in the codebase yet — a plausible future join, tried two ways. One way happened to work by coincidence (joining with a bare newline, letting the baked-in marker serve as the separator). The other — joining the same way the sibling function's own internal convention already does — produced a doubled `"* * "` marker on every line. That the "safe" join was still possible is what made this genuinely a latent risk rather than an obvious break: the current code was correct under one join strategy and silently wrong under another equally reasonable one.
+- The fix was a one-line reversion. The verification method — testing against a consumer that hasn't been built yet — is the more transferable lesson than the bug itself.
+
+## Milestone 25 — The fourth narrative field, and a typo with a 100% crash rate
+
+*Internal cross-reference: blueprint Entries 60–61. See also Patterns Journal, "Bugs only findable by running the code, not reading it."*
+
+**Problem**
+
+The last of the four narrative fields, `Data Flags`, needed a nine-theme phrase bank (the original seven plus two retrofitted flavor themes) and a builder matching the pattern the third field had already established. Real data grounding showed a clean, consistent structural signature — every real bullet opens with an imperative or gerund verb — that the phrase bank needed to match exactly.
+
+**Options considered**
+
+1. Reuse the shared `THEME_PHRASES` bank the way `Snapshot` does, for the two retrofitted flavor themes.
+2. Add the two flavor themes only to the single-purpose banks that don't carry shared-infrastructure risk.
+3. For the builder itself, reuse the established one-bullet-per-bucket pattern without re-deriving whether it fits this field's real distribution.
+4. Check the real field's own bullet-count distribution before assuming the pattern transfers.
+
+**Chosen solution**
+
+Options 2 and 4.
+
+**Trade-offs**
+
+- Option 1 was rejected for the same reason it was rejected in the original retrofit decision: the shared bank is the highest-verification-cost surface in the file, since two already-completed, already-verified fields depend on it.
+- Option 3 would have been a reasonable default given how well the pattern already worked for the third field — but checking anyway confirmed it independently: real bullet counts across five sampled rows (3, 2, 2, 2, 3) support the same shape on their own evidence, not by inheritance.
+- The phrase bank went through the same multi-round review every prior bank required — one theme needed two full passes to reach a grammatical sentence at all, several typos, one small instance of the same cross-theme word-leak category caught at much larger scale in an earlier field.
+- The builder itself introduced one bug with an unusually clean signature: a stray unary minus before a function call that always returns either `None` or a tuple — types Python cannot negate. Every prior crash-rate finding in this project up to this point was partial (a field's second-worst case was 82% of weeks); this was 100% of calls, unconditionally, which made it fast to diagnose once actually run, in contrast to how easy the single extra character was to miss on a read.
+- Final verification: 1,950 real weeks, 0 crashes, 4,551 bullets checked (100% correctly formatted), 1,816 bullets keyword-audited (100% correct). All four narrative fields are complete. Remaining generator work: the function that orchestrates all four per real row, and the CSV writer.

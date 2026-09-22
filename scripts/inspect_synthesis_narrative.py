@@ -5,7 +5,8 @@ from src.generator.synthesis_narrative import (
   _select_weekly_narrative_themes, 
   _build_snapshot, 
   _build_shift_bullet, 
-  _build_learning_mechanism
+  _build_learning_mechanism,
+  _build_data_flags,
 )
 
 def inspect_weekly_narrative(selection):
@@ -103,6 +104,14 @@ print("\n" + "-" * 60)
 print("LEARNING MECHANISMS OBSERVED")
 print("-" * 60)
 
-learning_mechanisms = _build_learning_mechanism(rng, selection)
+learning_mechanisms = _build_learning_mechanism(selection)
 
 print(learning_mechanisms)
+
+print("\n" + "-" * 60)
+print("DATA FLAGS (OPTIONAL)")
+print("-" * 60)
+
+data_flags = _build_data_flags(selection)
+
+print(data_flags)
