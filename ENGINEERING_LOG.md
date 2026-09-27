@@ -678,3 +678,97 @@ Options 2 and 4.
 - The phrase bank went through the same multi-round review every prior bank required — one theme needed two full passes to reach a grammatical sentence at all, several typos, one small instance of the same cross-theme word-leak category caught at much larger scale in an earlier field.
 - The builder itself introduced one bug with an unusually clean signature: a stray unary minus before a function call that always returns either `None` or a tuple — types Python cannot negate. Every prior crash-rate finding in this project up to this point was partial (a field's second-worst case was 82% of weeks); this was 100% of calls, unconditionally, which made it fast to diagnose once actually run, in contrast to how easy the single extra character was to miss on a read.
 - Final verification: 1,950 real weeks, 0 crashes, 4,551 bullets checked (100% correctly formatted), 1,816 bullets keyword-audited (100% correct). All four narrative fields are complete. Remaining generator work: the function that orchestrates all four per real row, and the CSV writer.
+
+## Milestone 27 — "Same seed, same output" wasn't actually true, and here's the one line that fixed it
+
+*Internal cross-reference: blueprint Entry 62. See also Patterns Journal, "Correct by coincidence, not by construction" — third occurrence.*
+
+**Problem**
+
+Two environments running what should have been an identical seeded pipeline produced different theme orderings for tied scores. After ruling out an environment mismatch (a reconstruction of one file was missing several functions — a red herring, fixed, and the discrepancy persisted), the actual cause turned out to be inside the generator itself.
+
+**Options considered**
+
+1. Assume the discrepancy was environmental and stop investigating once the obvious mismatch (the missing functions) was fixed.
+2. Reproduce the exact anomaly in isolation, with no RNG involved at all, to find the real mechanism.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 would have missed a real bug. The obvious fix (restoring the missing functions) explained *most* of the divergence but not all of it — a smaller, remaining discrepancy was still there, and it would have been easy to write off as noise.
+- Isolating it took one experiment: printing the same Python set, from three separate process invocations, with no seed anywhere in the code. Three different orderings. Python randomizes string hash values per process by default — a security property, unrelated to any seed a program sets itself — and the generator's theme-selection function built its candidate list directly from a set, letting that randomization leak into a sort that was supposed to be fully seed-determined.
+- The fix was one line: sort the set before using it. What mattered more than the fix was scoping it — checking whether the same pattern existed anywhere else in the codebase (one other set usage was found, confirmed safe, since it's only ever used for membership testing, never iterated), and checking which existing guarantees the bug did and didn't break (an explicit tiebreak elsewhere in the same file was already immune, because it compared on an actual field rather than relying on arrival order).
+- Verified with the simplest possible test: run the exact same seed through three separate process starts, confirm byte-identical output. That's now true. It wasn't before, for any case involving an unresolved tie — which, checked separately in an earlier milestone, is over half of all generated weeks.
+
+## Milestone 28 — Recalibrating a theme-selection distribution against real data, and why "already verified" isn't the same as "verified for this"
+
+*Internal cross-reference: blueprint Entry 63.*
+
+**Problem**
+
+A pattern noticed by inspection — one student's individual theme bucket coming up empty unusually often — led to a direct comparison against the real dataset. Synthetic weeks were touching nearly the entire eleven-theme pool on average; real weeks touched about six of eleven. The function responsible had already been built, reviewed, and verified in an earlier milestone.
+
+**Options considered**
+
+1. Treat the existing verification as sufficient, since the function had already passed its aggregate correlation checks.
+2. Recognize that the existing checks tested a different property than the one now in question, and recalibrate.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 conflates two different claims: "this function's output correlates correctly with ratings" and "this function draws a realistic number of themes per week." The first was true and stayed true; the second had never actually been checked. Passing verification on one axis doesn't imply passing on another axis nobody tested.
+- The actual recalibration was iterative, not solved in one step, and the target itself needed a caveat: the real comparison point (how often a week touches the full theme pool) came from a small sample, so it was treated as a rough target, not a number to hit precisely. Several candidate distributions were tried; the first ones that matched the *average* correctly turned out to eliminate almost all of the occasional high-saturation weeks the real data still shows, which meant the shape of the distribution mattered as much as its mean.
+- Recalibrating one part of a function creates a direct obligation to re-verify the parts that weren't touched, not just the part that was. The rating-correlation mechanism was left completely alone; it was re-checked anyway, across fifty seeds and thousands of sessions per theme, and all seven correlations held. That confirmation is what makes this a completed recalibration rather than a plausible one.
+
+## Milestone 29 — The same reproducibility mistake, twice, in two different mechanisms
+
+*Internal cross-reference: blueprint Entry 64. See also Patterns Journal, "Correct by coincidence, not by construction."*
+
+**Problem**
+
+A new function needed to generate a plausible timestamp for each weekly record, offset by a few random days and a random time of day from a fixed reference date.
+
+**Options considered**
+
+1. Use Python's standard library `random` module directly — the most familiar tool for "give me a random number."
+2. Use the same seeded random number generator every other piece of randomness in this codebase already uses.
+
+**Chosen solution**
+
+Option 2, after option 1 shipped first and was caught.
+
+**Trade-offs**
+
+- Option 1 is a completely reasonable default in most Python code, which is exactly why this is worth recording precisely: the choice here wasn't made from being unaware that a seeded generator might be the right tool — that possibility crossed the author's mind at the point of writing the function. The relevant guideline simply didn't surface in the moment it was needed. That's a different, and more common, failure than a knowledge gap — the standing rule existed, was known, and still didn't get applied, because nothing in the moment of writing the new function prompted a check against it. Confirmed the resulting bug directly: seeding the project's own random generator twice with the identical value, then calling the standard library's random function once each time, produced two different results — the two systems share no state at all.
+- This is the same underlying failure just fixed one function over, in a completely different function, via a different mechanism entirely (an unrelated PRNG system, not a hash-ordering quirk this time). The useful data point isn't "a rule was unknown" — it's that knowing a rule in general doesn't guarantee it gets recalled at the specific moment a new piece of code needs it, especially when the new code doesn't superficially resemble whatever prompted learning the rule the first time.
+- Two smaller issues shipped alongside the reproducibility bug in the same function: the random offset only ever moved in one direction (real data needed it centered both ways), and a date/datetime type mismatch caused an immediate crash on every call once the first bug was fixed (adding a time-of-day component onto a date-only value, which structurally can't hold one). All three were caught the same way: trace the exact operation against what the real data and real types actually require, then verify the fix against real generated output rather than trust that it looks right.
+
+## Milestone 30 — Precise type hints aren't just documentation; they're a bug check that runs before the code does
+
+*Internal cross-reference: blueprint Entry 65.*
+
+**Problem**
+
+A direct request to check parameter types across a file surfaced more than expected once done systematically: several return types were not just vague but actively wrong, and one function had almost no type information at all. The natural fix — writing out the fully precise nested type for one particular value shape — was accurate but long enough to raise a real question: is this worth the verbosity?
+
+**Options considered**
+
+1. Simplify the precise type back down to something shorter and less exact, trading correctness of detail for readability.
+2. Keep the full precision, accepting the verbosity as the cost of accuracy.
+3. Extract the repeated shape into a named type alias, defined once, used everywhere it recurs.
+
+**Chosen solution**
+
+Option 3.
+
+**Trade-offs**
+
+- Options 1 and 2 frame this as a binary trade-off it doesn't have to be. A named alias, defined once near the top of the file, gives every function that uses it both a short name and full precision simultaneously — there's no real reason to choose between them once the repeated shape is named.
+- The more interesting result came from testing what the precision actually buys, concretely rather than in the abstract: a static type checker was pointed at a minimal reproduction of a real bug from earlier work — a stray unary minus applied to a value that could be `None`, which had crashed every single call at runtime and was only found by actually running the code. With the precise types in place, the checker flagged it immediately, with no code execution at all. The same bug, found two different ways: once, expensively, by running broken code and reading a traceback; the second time, for free, before anything ran.
+- The general lesson is about where verification effort should go. Precise types don't replace tests — they catch a different, narrower class of mistake (wrong shape, wrong operation on a type) than tests catch (wrong logic, wrong output). But that narrower class is exactly the class most likely to slip through as a codebase grows past what one person can hold in their head, which makes it a cheap, standing complement to the testing work already planned for this file, not a substitute for it.

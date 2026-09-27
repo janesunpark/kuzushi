@@ -1,117 +1,106 @@
-from collections import Counter
-import numpy as np
+from datetime import date
 
+from src.generator._helpers import _generate_rng
+from src.generator.schedule_generation import (
+    combine_schedules,
+    derive_session_rows,
+    generate_synthesis_log_rows,
+)
+from src.generator.session_enrichment import (
+    assign_observation_context,
+    assign_observer_id,
+    assign_core_ratings,
+    assign_secondary_ratings,
+    assign_primary_task_type,
+    assign_puzzle_type,
+    assign_notes,
+)
+from src.generator.synthesis_enrichment import (
+    assign_synthesis_static_fields,
+    assign_jj_synthesis_fields,
+    summarize_weekly_notes_themes,
+)
 from src.generator.synthesis_narrative import (
-  _select_weekly_narrative_themes, 
-  _build_snapshot, 
-  _build_shift_bullet, 
-  _build_learning_mechanism,
-  _build_data_flags,
+    _select_weekly_narrative_themes,
+    assign_narrative_fields,
+    assign_synthesis_timestamp,
 )
 
-def inspect_weekly_narrative(selection):
-  print("=" * 60)
-  print("THEME SELECTION")
-  print("=" * 60)
+NARRATIVE_FIELDS = [
+    "Snapshot",
+    "Notable Shifts or Confirmations",
+    "Learning Mechanisms Observed",
+    "Optional: Data Flags (If Relevant)",
+]
 
-  all_themes = selection["all_themes"]
-  top_themes = selection["top_themes"]
 
-  for bucket, entries in all_themes.items():
-    print(f"\n{bucket}:")
-    for theme, score, has_jj in entries:
-      print(
-        f"  {theme:<15} "
-        f"score={score:<3} "
-        f"JJ={has_jj}"
-      )
+def inspect_theme_selection(
+    weekly_counts,
+    weekly_jj_themes,
+    week
+): 
+    print("=" * 60)
+    print(f"THEME SELECTION - week {week}")
+    print("=" * 60)
 
-  print("\n" + "-" * 60)
-  print("TOP THEMES")
-  print("-" * 60)
+    selection = _select_weekly_narrative_themes(
+        weekly_counts[week],
+        weekly_jj_themes.get(week, {})
+    )
 
-  for bucket, entries in top_themes.items():
-    print(f"\n{bucket}:")
-    for entry in entries:
-      print(f"  {entry}")
+    for bucket, entries in selection["all_themes"].items():
+        print(f"\n{bucket}:")
+        for theme, score, has_jj in entries:
+            print(f" {theme:<15} score={score:<3} JJ={has_jj}")
 
-rng = np.random.default_rng(42)
 
-week_enrichment_counts = {
-  "S01": Counter({
-    "flexib": 4,
-    "engag": 3,
-    "structure": 2,
-  }),
-  "S02": Counter({
-    "flexib": 3,
-    "motivat": 2,
-    "familiar": 2,
-  }),
-}
+def inspect_narrative_row(row):
+    print("\n" + "-" * 60)
+    print(f"SYNTHESIS ROW - week {row['week_ending']}")
+    print("-" * 60)
+    for field in NARRATIVE_FIELDS:
+        print(f"\n--- {field} ---")
+        print(row[field] if row[field] else "(empty)")
 
-week_jj_themes = {
-  "S01": {"flexib", "structure"},
-  "S02": {"motivat"},
-}
 
-selection = _select_weekly_narrative_themes(
-  week_enrichment_counts,
-  week_jj_themes,
-)
+def main():
+    seed = 42
+    rng = _generate_rng(seed)
 
-inspect_weekly_narrative(selection)
+    schedule = combine_schedules(rng, 2)
+    rows = derive_session_rows(schedule)
+    rows = assign_observation_context(rows, rng, date(2026, 1, 25))
+    rows = assign_observer_id(rows, date(2025, 12, 14))
+    rows = assign_core_ratings(rows, rng)
+    rows = assign_secondary_ratings(rows, rng)
+    rows = assign_primary_task_type(rows, rng, date(2026, 4, 5))
+    rows = assign_puzzle_type(rows, rng, date(2026, 3, 22), date(2026, 4, 5))
+    rows = assign_notes(rows, rng)
 
-print("\n" + "-" * 60)
-print("SNAPSHOT")
-print("-" * 60)
+    weekly_counts, weekly_jj_themes = summarize_weekly_notes_themes(rows)
 
-snapshot = _build_snapshot(rng, selection)
+    synthesis_cutoff = date(2026, 1, 25)
+    synthesis_rows = generate_synthesis_log_rows(
+        schedule,
+        synthesis_cutoff,
+        2
+    )
+    synthesis_rows = assign_synthesis_static_fields(synthesis_rows)
+    synthesis_rows = assign_jj_synthesis_fields(synthesis_rows, rng, date(2026, 2, 22))
 
-print(snapshot)
+    print(f"Synthesis rows before narrative fields: {len(synthesis_rows)}\n")
 
-print("\n" + "-" * 60)
-print("NOTABLE SHIFTS OR CONFIRMATIONS")
-print("-" * 60)
+    synthesis_rows = assign_narrative_fields(
+        synthesis_rows, weekly_counts, weekly_jj_themes, rng
+    )
 
-week_top_score = max(
-  entry[1]
-  for entries in selection["all_themes"].values()
-  for entry in entries
-)
+    print(f"Synthesis rows after narrative fields: {len(synthesis_rows)}\n")
 
-for student in ["S01", "S02"]:
-  entries = selection["all_themes"][f"{student}_individual"]
+    # Inspect the first two weeks: theme selection alongside the actual field output, so it's visible which theme drove which sentences.
+    for row in synthesis_rows[:5]:
+        inspect_theme_selection(weekly_counts, weekly_jj_themes, row["week_ending"])
+        inspect_narrative_row(row)
 
-  if not entries:
-    continue
-
-  theme, score, has_jj = entries[0]
-
-  notable_shift = _build_shift_bullet(
-    rng,
-    theme=theme,
-    score=score,
-    has_jj=has_jj,
-    bucket_type="individual",
-    week_top_score=week_top_score,
-    student=student,
-  )
-
-  print(notable_shift)
-
-print("\n" + "-" * 60)
-print("LEARNING MECHANISMS OBSERVED")
-print("-" * 60)
-
-learning_mechanisms = _build_learning_mechanism(selection)
-
-print(learning_mechanisms)
-
-print("\n" + "-" * 60)
-print("DATA FLAGS (OPTIONAL)")
-print("-" * 60)
-
-data_flags = _build_data_flags(selection)
-
-print(data_flags)
+    
+if __name__ == "__main__":
+    main()

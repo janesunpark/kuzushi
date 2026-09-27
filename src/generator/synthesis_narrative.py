@@ -1,5 +1,11 @@
 from collections import Counter
+from datetime import date, datetime, timedelta
 import numpy as np
+
+
+ThemeEntry = tuple[str, int, bool] # (theme_name, score, has_jj)
+ThemeBucket = list[ThemeEntry] # one bucket's ranked entries
+ThemeSelection = dict[str, dict[str, ThemeBucket]] # {"all_themes": {...}, "top_themes": {...}}
 
 
 THEME_PHRASES = {
@@ -128,7 +134,11 @@ DATA_FLAG_PHRASES = {
   },
 }
 
-def _first_known_theme(entries, phrase_bank):
+def _first_known_theme(
+    entries: ThemeBucket, 
+    phrase_bank: dict[str, dict[str, str]],
+) -> ThemeEntry | None:
+  
   for entry in entries:
     if entry[0] in phrase_bank:
       return entry
@@ -138,7 +148,7 @@ def _first_known_theme(entries, phrase_bank):
 def _select_weekly_narrative_themes(
     week_enrichment_counts: dict[str, Counter],
     week_jj_themes: dict[str, set],
-) -> dict:
+) -> ThemeSelection:
 
   cross_learner_raw = []
   s01_individual_raw = []
@@ -149,7 +159,7 @@ def _select_weekly_narrative_themes(
   s01_jj = week_jj_themes.get("S01", set())
   s02_jj = week_jj_themes.get("S02", set())
 
-  all_theme_names = set(s01_counter) | set(s02_counter)
+  all_theme_names = sorted(set(s01_counter) | set(s02_counter))
 
   for theme in all_theme_names:
     in_s01 = theme in s01_counter
@@ -184,13 +194,14 @@ def _select_weekly_narrative_themes(
 
 def _build_shift_bullet(
     rng: np.random.Generator,
-    theme,
-    score,
-    has_jj,
-    bucket_type,
-    week_top_score,
-    student=None
-): 
+    theme: str,
+    score: int,
+    has_jj: bool,
+    bucket_type: str,
+    week_top_score: int,
+    student: str | None = None,
+) -> str:
+  
   is_strong = score >= 0.5 * week_top_score and score >=2
   framing = rng.choice(FRAMING_CLAUSES["confirmed" if is_strong else "shift"])
 
@@ -207,7 +218,7 @@ def _build_shift_bullet(
 
 def _build_snapshot(
     rng: np.random.Generator,
-    selection: dict,
+    selection: ThemeSelection,
 ) -> str:
 
   candidates = []
@@ -296,7 +307,7 @@ def _build_snapshot(
 
 
 def _build_learning_mechanism(
-    selection: dict,
+    selection: ThemeSelection,
 ) -> str:
 
   all_themes = selection["all_themes"]
@@ -336,7 +347,7 @@ def _build_learning_mechanism(
 
 
 def _build_data_flags(
-    selection: dict,
+    selection: ThemeSelection,
 ) -> str:
 
   all_themes = selection["all_themes"]
@@ -373,3 +384,81 @@ def _build_data_flags(
   if not bullets:
     return ""
   return "* " + "\n* ".join([item + "." for item in bullets])
+
+
+def assign_narrative_fields(
+    synthesis_rows: list[dict],
+    weekly_counts: dict[date, dict[str, Counter]],
+    weekly_jj_themes: dict[date, dict[str, set]],
+    rng: np.random.Generator,
+) -> list[dict]:
+  
+  finalized_rows = []
+
+  for row in synthesis_rows:
+    new_row = row.copy()
+    week = new_row["week_ending"]
+    selection = _select_weekly_narrative_themes(weekly_counts[week], weekly_jj_themes.get(week, {}))
+
+    new_row["Snapshot"] = _build_snapshot(rng, selection)
+
+    week_top_score = max(score for bucket in selection["all_themes"].values() for _, score, _ in bucket)
+
+    notable_shift_bullets = []
+
+    for student in ["S01", "S02"]:
+      entries = selection["all_themes"][f"{student}_individual"]
+      entry = _first_known_theme(entries, THEME_PHRASES)
+      if entry is None:
+        continue
+      theme, score, has_jj = entry
+      notable_shift = _build_shift_bullet(
+        rng,
+        theme=theme,
+        score=score,
+        has_jj=has_jj,
+        bucket_type="individual",
+        week_top_score=week_top_score,
+        student=student,
+      )
+
+      notable_shift_bullets.append(notable_shift)
+
+    new_row["Notable Shifts or Confirmations"] = (
+      "* " + "\n* ".join(notable_shift_bullets) if notable_shift_bullets else ""
+    )
+
+    new_row["Learning Mechanisms Observed"] = _build_learning_mechanism(selection)
+
+    new_row["Optional: Data Flags (If Relevant)"] = _build_data_flags(selection)
+
+    finalized_rows.append(new_row)
+
+  return finalized_rows
+
+
+def assign_synthesis_timestamp(
+    synthesis_rows: list[dict],
+    rng: np.random.Generator,
+) -> list[dict]:
+
+  finalized_rows = []
+
+  for row in synthesis_rows:
+    new_row = row.copy()
+    random_days = int(rng.integers(-3, 4))
+    timestamp_date = new_row["week_ending"] + timedelta(days=random_days)
+
+    timestamp = datetime(
+      timestamp_date.year,
+      timestamp_date.month,
+      timestamp_date.day,
+      hour=int(rng.integers(0, 24)),
+      minute=int(rng.integers(0, 60)),
+      second=int(rng.integers(0, 60)),
+    )
+
+    new_row["timestamp"] = timestamp
+    finalized_rows.append(new_row)
+
+  return finalized_rows
