@@ -42,7 +42,7 @@ Kuzushi uses the following principles when preparing public-facing materials:
 
 ## Interpretation Boundaries
 
-Kuzushi is an exploratory observational project. Public notes should not be interpreted as formal research findings, clinical assessments, educational evaluations, or evidence of causal relationshps.
+Kuzushi is an exploratory observational project. Public notes should not be interpreted as formal research findings, clinical assessments, educational evaluations, or evidence of causal relationships.
 
 The project does not claim that participation in Jiu Jitsu causes academic improvement, nor does it claim that observed patterns prove transfer between embodied and academic domains. Cross-context observations are treated as exploratory signals that may help generate future research questions.
 
