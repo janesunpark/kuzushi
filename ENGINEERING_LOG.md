@@ -772,3 +772,28 @@ Option 3.
 - Options 1 and 2 frame this as a binary trade-off it doesn't have to be. A named alias, defined once near the top of the file, gives every function that uses it both a short name and full precision simultaneously — there's no real reason to choose between them once the repeated shape is named.
 - The more interesting result came from testing what the precision actually buys, concretely rather than in the abstract: a static type checker was pointed at a minimal reproduction of a real bug from earlier work — a stray unary minus applied to a value that could be `None`, which had crashed every single call at runtime and was only found by actually running the code. With the precise types in place, the checker flagged it immediately, with no code execution at all. The same bug, found two different ways: once, expensively, by running broken code and reading a traceback; the second time, for free, before anything ran.
 - The general lesson is about where verification effort should go. Precise types don't replace tests — they catch a different, narrower class of mistake (wrong shape, wrong operation on a type) than tests catch (wrong logic, wrong output). But that narrower class is exactly the class most likely to slip through as a codebase grows past what one person can hold in their head, which makes it a cheap, standing complement to the testing work already planned for this file, not a substitute for it.
+
+## Milestone 31 — Serializing to a real-world CSV shape that a clean data model can't represent
+
+*Internal cross-reference: blueprint Entry 66.*
+
+**Problem**
+
+The session log's real, external header row contains the same column name twice: once for a genuinely populated field, once for an always-empty duplicate inherited from the source spreadsheet. Any output format keyed by column name — a plain dictionary, or a DataFrame built from one — can only hold one value per name, so the two most obvious ways to write this file couldn't represent its actual shape at all.
+
+**Options considered**
+
+1. Use `pandas.DataFrame(rows).to_csv(...)`, the default choice for tabular output elsewhere in this kind of project.
+2. Use `csv.DictWriter`, which maps a header list to per-row dictionaries.
+3. Use plain `csv.writer` against an explicit, ordered list of columns, with each row built as a positional list of values rather than a dict.
+
+**Chosen solution**
+
+Option 3.
+
+**Trade-offs**
+
+- `csv.DictWriter` requires each row as a Python dict, and a dict cannot hold two distinct values under one key at all — confirmed directly: a dict literal with a repeated key doesn't even raise an error, it silently keeps only the last value assigned. That's an unconditional property of the type, with no workaround. `DataFrame.to_csv()` is a different case, and grouping it with `DictWriter` overstates it: a DataFrame stores columns positionally internally, with the column name as a label rather than a uniqueness-enforcing key, so it can genuinely hold and correctly write two distinct, differently-valued columns sharing one name — confirmed directly, including through `to_csv()`. What actually rules it out here is narrower: this project's rows are themselves Python dicts, and building a DataFrame from `list[dict]` can never produce a genuine duplicate in the first place, since two different dict keys always become two differently-named columns. Reaching the real shape would need an extra, non-obvious step after construction, not the natural one-liner.
+- Option 3 sacrifices the convenience of "one line, done" that a DataFrame or DictWriter would offer for anything without this constraint. In exchange, it can represent the file exactly as it really exists — the duplicate column included, at its exact real position, not approximated or dropped. The two positions are also kept genuinely independent by giving the ghost duplicate its own distinct internal key, rather than trying to duplicate a single value at write time — which matters, since the real column is meant to be populated and the ghost is meant to always be empty, and those are two different pieces of data that happen to share a display name.
+- A related decision: what to do when an expected field isn't found on a row. `None` values are common and intentional throughout this dataset — a field genuinely not yet applicable, or deprecated. But a *missing key entirely* is a different problem: a bug in the writer's own column list, not a legitimate data state. Treating both the same way, by letting a lookup silently default to empty, would hide exactly the kind of mistake most likely to occur in a brand-new piece of code and least likely to be noticed once it's writing plausible-looking output to a file that isn't checked back against the source data on every run. The writer raises specifically when a key is absent, and only then, leaving every legitimate null exactly as it already was.
+- Verified against 50 seeds and several thousand real rows: the file's exact real header, including the duplicate text at both positions, the row counts matched exactly against the pipeline's own output, and the ghost columns confirmed empty at every single position across the entire run while the real duplicate populated normally.
