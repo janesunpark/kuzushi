@@ -797,3 +797,27 @@ Option 3.
 - Option 3 sacrifices the convenience of "one line, done" that a DataFrame or DictWriter would offer for anything without this constraint. In exchange, it can represent the file exactly as it really exists — the duplicate column included, at its exact real position, not approximated or dropped. The two positions are also kept genuinely independent by giving the ghost duplicate its own distinct internal key, rather than trying to duplicate a single value at write time — which matters, since the real column is meant to be populated and the ghost is meant to always be empty, and those are two different pieces of data that happen to share a display name.
 - A related decision: what to do when an expected field isn't found on a row. `None` values are common and intentional throughout this dataset — a field genuinely not yet applicable, or deprecated. But a *missing key entirely* is a different problem: a bug in the writer's own column list, not a legitimate data state. Treating both the same way, by letting a lookup silently default to empty, would hide exactly the kind of mistake most likely to occur in a brand-new piece of code and least likely to be noticed once it's writing plausible-looking output to a file that isn't checked back against the source data on every run. The writer raises specifically when a key is absent, and only then, leaving every legitimate null exactly as it already was.
 - Verified against 50 seeds and several thousand real rows: the file's exact real header, including the duplicate text at both positions, the row counts matched exactly against the pipeline's own output, and the ghost columns confirmed empty at every single position across the entire run while the real duplicate populated normally.
+
+## Milestone 32 — A type checker caught a bug that testing and real-data comparison never would have
+
+*Internal cross-reference: blueprint Entry 67. See also Patterns Journal, "Correct by coincidence, not by construction" — fifth occurrence.*
+
+**Problem**
+
+A static type checker flagged a method call on a value it believed could be `None`. Tracing the function responsible showed the warning was correct: it has a real code path that returns `None`, and the only thing preventing that path from ever firing is that every current caller happens to pass an argument aligned with a hard-coded value elsewhere in the same function — two independent values that agree today by coincidence, not by anything in the code that connects them.
+
+**Options considered**
+
+1. Silence the warning at the call site with a null check or a type-ignore comment.
+2. Fix the function that produces the ambiguous value, so the return type is no longer optional in the first place.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 would have resolved the warning without touching the actual fragility. The unstated assumption connecting the two independent values would still exist, unexamined, ready to fail the next time something upstream changes without anyone remembering why a particular date mattered.
+- Option 2 required tracing the function back to its one call site and confirming, deliberately, why it had never actually failed — not assuming a warning must be a false alarm just because the code currently works, and not assuming it must be a real bug just because the checker flagged it. Both directions were checked directly, since the same session had already run into a genuine false alarm from the same tool, one stemming from an unrelated cause (a type stub too narrow for a legitimate runtime pattern, not a logic error).
+- The fix makes the function raise, by name, the moment its assumption is violated, rather than let a `None` travel a few lines further and fail somewhere less informative. That also resolves the type checker's complaint as a side effect of fixing the real contract, rather than as the goal itself — the return type is now genuinely never optional, not just asserted not to be.
+- The broader value here isn't the one-line fix. It's the discovery method. Every prior instance of this same failure shape — code that's right today for a reason nothing actually enforces — was found by writing a test, comparing against real data, or running the same code across separate processes. This is the first one a type checker caught on its own, during ordinary development, before any of that verification work ran at all.

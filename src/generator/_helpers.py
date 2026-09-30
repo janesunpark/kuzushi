@@ -85,6 +85,9 @@ def _find_phase(phases, _true_week_ending):
     else:
       break
 
+  if selected_weights is None:
+    raise ValueError(f"No phase found for {_true_week_ending!r} — earliest phase starts {phases[0][0]!r}")
+
   return selected_weights
 
 
