@@ -444,3 +444,26 @@ def test_weekly_narrative_themes_tie_ordering():
   theme_list = [theme for theme, _, _ in cross_learner_entries]
 
   assert theme_list == ["engag", "independen"]
+
+# =============================================================================
+# Weekly snapshot theme selection
+# =============================================================================
+
+def test_build_snapshot_cross_bucket_tiebreak():
+
+  rng = sg._generate_rng(42)
+
+  prefix = "Both learners drew on familiar strategies this week"
+
+  selection = {
+    "all_themes": {
+      "cross_learner": [("familiar", 2, False)],
+      "S01_individual": [("independen", 1, False)],
+      "S02_individual": [("engag", 2, False)],
+    },
+    "top_themes": {}
+  }
+
+  snapshot = sg._build_snapshot(rng, selection)
+
+  assert snapshot.startswith(prefix)
