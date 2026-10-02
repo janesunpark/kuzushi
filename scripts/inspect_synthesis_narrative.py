@@ -23,7 +23,6 @@ from src.generator.synthesis_enrichment import (
 from src.generator.synthesis_narrative import (
     _select_weekly_narrative_themes,
     assign_narrative_fields,
-    assign_synthesis_timestamp,
 )
 
 NARRATIVE_FIELDS = [
@@ -97,7 +96,7 @@ def main():
     print(f"Synthesis rows after narrative fields: {len(synthesis_rows)}\n")
 
     # Inspect the first two weeks: theme selection alongside the actual field output, so it's visible which theme drove which sentences.
-    for row in synthesis_rows[:5]:
+    for row in synthesis_rows[:2]:
         inspect_theme_selection(weekly_counts, weekly_jj_themes, row["week_ending"])
         inspect_narrative_row(row)
 

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import date
+from datetime import date, datetime
 from collections import Counter
 
 from src import synthetic_generator as sg
@@ -467,3 +467,33 @@ def test_build_snapshot_cross_bucket_tiebreak():
   snapshot = sg._build_snapshot(rng, selection)
 
   assert snapshot.startswith(prefix)
+
+# =============================================================================
+# Narrative field assignment
+# =============================================================================
+
+def test_assign_narrative_fields_valid_week_ending():
+
+  rng = sg._generate_rng(42)
+
+  synthesis_row = [{
+    "week_ending": date(2026, 5, 31),
+    "timestamp": datetime(2025, 12, 25, 0, 0)
+  }]
+
+  weekly_counts = {
+    date(2026, 5, 31): {"S01": Counter({"engag": 2}), "S02": Counter({"engag": 2})}
+  }
+  weekly_jj_themes = {
+    date(2026, 5, 31): {"S01": set(), "S02": set()}
+  }
+
+  result = sg.assign_narrative_fields(
+    synthesis_row,
+    weekly_counts,
+    weekly_jj_themes,
+    rng
+  )
+
+  assert result[0]["Snapshot"]
+  
