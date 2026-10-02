@@ -397,6 +397,9 @@ def assign_narrative_fields(
 
   for row in synthesis_rows:
     new_row = row.copy()
+    # week_ending is the lookup key into weekly_counts/weekly_jj_themes.
+    # timestamp is unrelated: a randomized form-submission time for display only 
+    # (see assign_synthesis_timestamp) -- never use it for lookups here.
     week = new_row["week_ending"]
     selection = _select_weekly_narrative_themes(weekly_counts[week], weekly_jj_themes.get(week, {}))
 
