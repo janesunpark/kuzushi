@@ -496,4 +496,33 @@ def test_assign_narrative_fields_valid_week_ending():
   )
 
   assert result[0]["Snapshot"]
+
+
+def test_assign_narrative_fields_returns_one_row_per_input_row():
+
+  rng = sg._generate_rng(42)
+
+  synthesis_rows = [
+    {"week_ending": date(2026, 5, 31)},
+    {"week_ending": date(2026, 6, 7)},
+  ]
+
+  weekly_counts = {
+    date(2026, 5, 31): {"S01": Counter({"engag": 2}), "S02": Counter({"engag": 2})},
+    date(2026, 6, 7): {"S01": Counter({"structure": 1}), "S02": Counter()},
+  }
+
+  weekly_jj_themes = {
+    date(2026, 5, 31): {"S01": set(), "S02": set()},
+    date(2026, 6, 7): {"S01": set(), "S02": set()},
+  }
+
+  result = sg.assign_narrative_fields(
+    synthesis_rows,
+    weekly_counts,
+    weekly_jj_themes,
+    rng
+  )
+
+  assert len(result) == len(synthesis_rows)
   
