@@ -525,4 +525,37 @@ def test_assign_narrative_fields_returns_one_row_per_input_row():
   )
 
   assert len(result) == len(synthesis_rows)
-  
+
+
+def test_assign_narrative_fields_returns_both_learners_individual_notable_shifts():
+
+  rng = sg._generate_rng(42)
+
+  synthesis_row = [{
+    "week_ending": date(2026, 5, 31)
+  }]
+
+  weekly_counts = {
+    date(2026, 5, 31): {
+      "S01": Counter({"structure": 2}), 
+      "S02": Counter({"familiar": 2})
+    }
+  }
+
+  weekly_jj_themes = {
+    date(2026, 5, 31): {"S01": set(), "S02": set()}
+  }
+
+  result = sg.assign_narrative_fields(
+    synthesis_row,
+    weekly_counts,
+    weekly_jj_themes,
+    rng
+  )
+
+  shift_narrative = result[0]["Notable Shifts or Confirmations"]
+  bullets = shift_narrative.splitlines()
+
+  assert len(bullets) == 2
+  assert bullets[0].startswith("* S01") 
+  assert bullets[1].startswith("* S02")
