@@ -531,9 +531,7 @@ def test_assign_narrative_fields_returns_both_learners_individual_notable_shifts
 
   rng = sg._generate_rng(42)
 
-  synthesis_row = [{
-    "week_ending": date(2026, 5, 31)
-  }]
+  synthesis_row = [{"week_ending": date(2026, 5, 31)}]
 
   weekly_counts = {
     date(2026, 5, 31): {
@@ -559,3 +557,19 @@ def test_assign_narrative_fields_returns_both_learners_individual_notable_shifts
   assert len(bullets) == 2
   assert bullets[0].startswith("* S01") 
   assert bullets[1].startswith("* S02")
+
+# =============================================================================
+# Weekly timestamp assignment
+# =============================================================================
+
+def test_assign_synthesis_timestamp_same_seed_assigns_same_timestamp():
+
+  rng1 = sg._generate_rng(42)
+  rng2 = sg._generate_rng(42)
+
+  synthesis_row = [{"week_ending": date(2026, 5, 31)}]
+
+  rows1 = sg.assign_synthesis_timestamp(synthesis_row, rng1)
+  rows2 = sg.assign_synthesis_timestamp(synthesis_row, rng2)
+
+  assert rows1 == rows2
