@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from collections import Counter
 
 from src import synthetic_generator as sg
@@ -573,3 +573,22 @@ def test_assign_synthesis_timestamp_same_seed_assigns_same_timestamp():
   rows2 = sg.assign_synthesis_timestamp(synthesis_row, rng2)
 
   assert rows1 == rows2
+
+
+def test_assign_synthesis_timestamp_days_offset_in_both_directions():
+
+  rng = sg._generate_rng(42)
+
+  synthesis_rows = [
+    {"week_ending": date(2026, 1, 25) + timedelta(days=7 * i)}
+    for i in range(20)
+  ]
+
+  timestamped_rows = sg.assign_synthesis_timestamp(synthesis_rows, rng)
+
+  offsets = [
+    (row["timestamp"].date() - row["week_ending"]).days for row in timestamped_rows
+  ]
+
+  assert -3 <= min(offsets) < 0
+  assert 0 < max(offsets) <= 3
