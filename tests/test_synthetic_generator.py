@@ -592,3 +592,21 @@ def test_assign_synthesis_timestamp_days_offset_in_both_directions():
 
   assert -3 <= min(offsets) < 0
   assert 0 < max(offsets) <= 3
+
+
+def test_assign_synthesis_timestamp_gives_each_row_its_own_datetime_time():
+
+  rng = sg._generate_rng(42)
+
+  synthesis_rows = [
+    {"week_ending": date(2026, 1, 25) + timedelta(days=7 * i)}
+    for i in range(20)
+  ]
+
+  timestamped_rows = sg.assign_synthesis_timestamp(synthesis_rows, rng)
+
+  assert all(isinstance(row["timestamp"], datetime) for row in timestamped_rows)
+
+  unique_times_set = {row["timestamp"].time() for row in timestamped_rows}
+
+  assert len(unique_times_set) == len(timestamped_rows)
