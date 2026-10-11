@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import date, datetime, timedelta
 from collections import Counter
+import csv
 
 from src import synthetic_generator as sg
 
@@ -610,3 +611,28 @@ def test_assign_synthesis_timestamp_gives_each_row_its_own_datetime_time():
   unique_times_set = {row["timestamp"].time() for row in timestamped_rows}
 
   assert len(unique_times_set) == len(timestamped_rows)
+
+
+def test_bronze_writer_check_ghost_cell_is_empty_and_real_cell_keeps_value(tmp_path):
+
+  target_header = "Task Difficulty or Novelty"
+
+  str_path = str(tmp_path/"test_data.csv")
+
+  row = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
+  row["Task Difficulty or Novelty"] = "4"
+  row["Task Difficulty or Novelty.1"] = ""
+
+  sg.write_session_csv([row], str_path)
+
+  with open(str_path, mode='r', newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_rows = list(reader)
+
+  duplicate_header_count = parsed_rows[0].count(target_header)
+
+  indices = [index for index, header in enumerate(parsed_rows[0]) if header == target_header]
+
+  assert duplicate_header_count == 2
+  assert parsed_rows[1][indices[0]] == "4"
+  assert parsed_rows[1][indices[1]] == ""
