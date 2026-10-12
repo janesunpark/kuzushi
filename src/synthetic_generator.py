@@ -13,3 +13,6 @@ from src.generator.synthesis_narrative import (
 )
 from src.generator.synthesis_narrative import *
 from src.generator.bronze_writer import *
+from src.generator.bronze_writer import (
+  _write_csv
+)

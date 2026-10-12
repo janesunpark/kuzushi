@@ -612,6 +612,9 @@ def test_assign_synthesis_timestamp_gives_each_row_its_own_datetime_time():
 
   assert len(unique_times_set) == len(timestamped_rows)
 
+# =============================================================================
+# Bronze writer guardrails
+# =============================================================================
 
 def test_bronze_writer_check_ghost_cell_is_empty_and_real_cell_keeps_value(tmp_path):
 
