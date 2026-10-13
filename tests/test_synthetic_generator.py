@@ -640,3 +640,36 @@ def test_bronze_writer_check_ghost_cell_is_empty_and_real_cell_keeps_value(tmp_p
   assert duplicate_header_count == 2
   assert parsed_rows[1][indices[0]] == "4"
   assert parsed_rows[1][indices[1]] == ""
+
+
+def test_bronze_writer_raises_KeyError_with_missing_internal_key_from_row(tmp_path):
+
+  str_path = str(tmp_path/"test_data.csv")
+
+  row: dict[str, str | None] = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
+  del row["observer_id"]
+
+  with pytest.raises(KeyError) as excinfo:
+    sg.write_session_csv([row], str_path)
+
+  assert "observer_id" in str(excinfo.value)
+  assert "Observer ID" in str(excinfo.value)
+
+
+def test_bronze_writer_allows_key_holding_None_and_writes_empty_cell(tmp_path):
+
+  real_header = "Resilience (Response to Mistakes or Corrections)"
+
+  str_path = str(tmp_path/"test_data.csv")
+
+  row: dict[str, str | None] = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
+  row["Resilience"] = None
+
+  sg.write_session_csv([row], str_path)
+
+  with open(str_path, mode='r', newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_rows = list(reader)
+
+  assert len(parsed_rows[1]) == len(sg.SESSION_COLUMNS)
+  assert parsed_rows[1][parsed_rows[0].index(real_header)] == ""
