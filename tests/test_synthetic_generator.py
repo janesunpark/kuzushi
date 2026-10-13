@@ -2,6 +2,7 @@ from copy import deepcopy
 from datetime import date, datetime, timedelta
 from collections import Counter
 import csv
+import pytest
 
 from src import synthetic_generator as sg
 
