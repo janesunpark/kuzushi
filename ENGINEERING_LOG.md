@@ -679,6 +679,31 @@ Options 2 and 4.
 - The builder itself introduced one bug with an unusually clean signature: a stray unary minus before a function call that always returns either `None` or a tuple — types Python cannot negate. Every prior crash-rate finding in this project up to this point was partial (a field's second-worst case was 82% of weeks); this was 100% of calls, unconditionally, which made it fast to diagnose once actually run, in contrast to how easy the single extra character was to miss on a read.
 - Final verification: 1,950 real weeks, 0 crashes, 4,551 bullets checked (100% correctly formatted), 1,816 bullets keyword-audited (100% correct). All four narrative fields are complete. Remaining generator work: the function that orchestrates all four per real row, and the CSV writer.
 
+## Milestone 26 — The orchestrator over four verified builders: every bug was in the glue
+
+*Internal cross-reference: blueprint Entry 61b. See also Patterns Journal, "Verification is scoped to what it checks, not to the function it checked."*
+
+**Problem**
+
+`assign_narrative_fields` turns four separately built narrative builders into one finished synthesis row: for each row, select the week's themes once, call all four builders, and write their output onto the row. Each builder had already been built, reviewed, and verified across 1,950 generated weeks. The orchestrator is the first code that composes them, and its first draft contained four defects, none of which any single builder's verification could have exposed.
+
+**Options considered**
+
+1. Treat the orchestrator as thin glue over four already-verified builders, and rely on their verification.
+2. Verify the orchestrator on its own terms: structural invariants across many seeds (row count in equals row count out, all four keys present and string-typed, bullet format correct), plus a read of real output for cross-field coherence.
+
+**Chosen solution**
+
+Option 2.
+
+**Trade-offs**
+
+- Option 1 is the natural assumption, since every component had passed, and it would have shipped all four defects. Every one lived in the composition: the week lookup used `"timestamp"` instead of `"week_ending"`; a `return` sat inside the loop instead of after it (three rows in, one out); one field was overwritten per student instead of accumulated across the per-student loop, so `Notable Shifts` ended up holding only the last student's bullet; and `Learning Mechanisms Observed` was never assigned at all. The builder existed and was correct. Nothing called it.
+- The first three are exactly what the established `assign_` shape exists to prevent: copy the row, set fields, append to a `finalized_rows` list built inside the loop, return after it. The function was written against that shape and still deviated from it in three places. A shape is a convention, and nothing enforces it.
+- One requirement had to be carried forward by hand. `_build_shift_bullet` does not filter flavor themes itself, so the orchestrator's per-student loop must run `_first_known_theme(entries, THEME_PHRASES)` before calling it. This is the same gap that gave `Snapshot` its 82% crash rate (Milestone 21), caught here before it shipped because it was already a known failure class.
+- Option 2 cost a check written specifically for the composition, since the builders' own checks could not be reused. Verified across 50 seeds and 999 real synthesis rows: 0 crashes, row counts matching exactly, all four narrative keys present and string-typed on every row, and `Notable Shifts` correctly formatted on 100% of non-empty rows. Real output was also read by eye for coherence across the four fields, not just for structure.
+- Writing regression tests later surfaced a quieter hazard in the same function. A synthesis row carries two date-like fields that read as interchangeable: `week_ending`, the real lookup key, and `timestamp`, a display-only value deliberately offset by up to three days. The first draft's wrong-key bug is easy to reproduce. The guards are a comment above the lookup and `test_assign_narrative_fields_valid_week_ending`, whose fixture can only pass if the function reads `week_ending`. Two further tests, `test_assign_narrative_fields_returns_one_row_per_input_row` and `test_assign_narrative_fields_returns_both_learners_individual_notable_shifts`, are aimed at the return-placement and accumulation defects respectively.
+
 ## Milestone 27 — "Same seed, same output" wasn't actually true, and here's the one line that fixed it
 
 *Internal cross-reference: blueprint Entry 62. See also Patterns Journal, "Correct by coincidence, not by construction" — third occurrence.*
