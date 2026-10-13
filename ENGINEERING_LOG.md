@@ -681,7 +681,7 @@ Options 2 and 4.
 
 ## Milestone 26 — The orchestrator over four verified builders: every bug was in the glue
 
-*Internal cross-reference: blueprint Entry 61b. See also Patterns Journal, "Verification is scoped to what it checks, not to the function it checked."*
+*Internal cross-reference: blueprint Entry 61b. Same class of problem as Milestone 4: every component correct in isolation, the defect only in how they compose.*
 
 **Problem**
 
