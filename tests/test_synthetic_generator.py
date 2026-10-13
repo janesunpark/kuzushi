@@ -623,7 +623,7 @@ def test_bronze_writer_check_ghost_cell_is_empty_and_real_cell_keeps_value(tmp_p
 
   str_path = str(tmp_path/"test_data.csv")
 
-  row = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
+  row: dict[str, str | None] = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
   row["Task Difficulty or Novelty"] = "4"
   row["Task Difficulty or Novelty.1"] = ""
 
