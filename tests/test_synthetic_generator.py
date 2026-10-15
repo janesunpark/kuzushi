@@ -7,6 +7,58 @@ import pytest
 from src import synthetic_generator as sg
 
 
+SESSION_HEADERS = [
+  'Timestamp',
+  'Observer ID',
+  'Student ID',
+  'Observation Context',
+  'Focus or Attention',
+  'Coordination and Motor Skills - may be DELETED',
+  'Carryover or Retention',
+  'Problem-Solving or Cognitive Flexibility',
+  'Resilience (Response to Mistakes or Corrections)',
+  'Confidence, Autonomy, or Initiative',
+  'Social Regulation - may be DELETED',
+  'Frustration Tolerance',
+  'Notes',
+  'Email Address',
+  'Abstract Thinking and Pattern Recognition',
+  'Impulse Modulation',
+  'Number of Pages Completed',
+  'Published Materials Used',
+  'Duration in Minutes',
+  'Emotional Tone of Teacher',
+  'Parent Interaction',
+  'Environment or Disruptions',
+  'Task Difficulty or Novelty',
+  'Puzzle Type',
+  'Puzzle Challenge or Novelty',
+  'Primary Task Type',
+  'Column 24',
+  'Column 25',
+  'Task Difficulty or Novelty',
+  'Column 23',
+]
+
+SYNTHESIS_HEADERS = [
+  'Timestamp',
+  'Observer ID',
+  'Student ID',
+  'Week of ',
+  'Number of Enrichment Sessions',
+  'Snapshot',
+  'Notable Shifts or Confirmations',
+  'Learning Mechanisms Observed',
+  'Optional: Data Flags (If Relevant)',
+  'Are participants siblings?',
+  'Dyad ID',
+  'If Jiu-Jitsu sessions were observed, for which learner(s)?',
+  'Select any learner(s) that take at least one weekly private lessons in Jiu-Jitsu.',
+  'Column 11',
+  'Column 12',
+  'Column 10',
+]
+
 # =============================================================================
 # RNG behavior
 # =============================================================================
@@ -629,7 +681,7 @@ def test_bronze_writer_check_ghost_cell_is_empty_and_real_cell_keeps_value(tmp_p
 
   sg.write_session_csv([row], str_path)
 
-  with open(str_path, mode='r', newline="", encoding="utf-8") as file:
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
     reader = csv.reader(file)
     parsed_rows = list(reader)
 
@@ -667,9 +719,40 @@ def test_bronze_writer_allows_key_holding_None_and_writes_empty_cell(tmp_path):
 
   sg.write_session_csv([row], str_path)
 
-  with open(str_path, mode='r', newline="", encoding="utf-8") as file:
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
     reader = csv.reader(file)
     parsed_rows = list(reader)
 
   assert len(parsed_rows[1]) == len(sg.SESSION_COLUMNS)
   assert parsed_rows[1][parsed_rows[0].index(real_header)] == ""
+
+
+def test_write_session_csv_header_rows_match_expected_result(tmp_path):
+
+  str_path = str(tmp_path/"test_data.csv")
+
+  row: dict[str, str | None] = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
+
+  sg.write_session_csv([row], str_path)
+
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_headers = list(reader)[0]
+
+  assert parsed_headers == SESSION_HEADERS
+
+
+def test_write_synthesis_csv_header_rows_match_expected_result(tmp_path):
+
+  str_path = str(tmp_path/"test_data.csv")
+
+  row: dict[str, str | None] = {internal: "test_val" for internal, _ in sg.SYNTHESIS_COLUMNS}
+
+  sg.write_synthesis_csv([row], str_path)
+
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_headers = list(reader)[0]
+
+  assert parsed_headers == SYNTHESIS_HEADERS
+  
