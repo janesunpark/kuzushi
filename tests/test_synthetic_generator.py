@@ -755,4 +755,33 @@ def test_write_synthesis_csv_header_rows_match_expected_result(tmp_path):
     parsed_headers = list(reader)[0]
 
   assert parsed_headers == SYNTHESIS_HEADERS
-  
+
+
+def test_write_synthesis_csv_writes_each_value_under_its_own_header(tmp_path):
+
+  str_path = str(tmp_path/"test_data.csv")
+
+  row: dict[str, str | None] = {internal: "test_val" for internal, _ in reversed(sg.SYNTHESIS_COLUMNS)}
+
+  row["Column 11"] = None
+  row["Column 10"] = None
+  row["Column 12"] = None
+  row["JJ Observed"] = "S01, S02"
+  row["Private Lessons"] = "S02"
+
+  sg.write_synthesis_csv([row], str_path)
+
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_rows = list(reader)
+
+  assert len(parsed_rows[1]) == len(SYNTHESIS_HEADERS)
+  assert parsed_rows[1][parsed_rows[0].index("Column 11")] == ""
+  assert parsed_rows[1][parsed_rows[0].index("Column 10")] == ""
+  assert parsed_rows[1][parsed_rows[0].index("Column 12")] == ""
+
+  jj_observed_header = "If Jiu-Jitsu sessions were observed, for which learner(s)?"
+  jj_private_header = "Select any learner(s) that take at least one weekly private lessons in Jiu-Jitsu."
+
+  assert parsed_rows[1][parsed_rows[0].index(jj_observed_header)] == "S01, S02"
+  assert parsed_rows[1][parsed_rows[0].index(jj_private_header)] == "S02"
