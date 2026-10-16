@@ -785,3 +785,33 @@ def test_write_synthesis_csv_writes_each_value_under_its_own_header(tmp_path):
 
   assert parsed_rows[1][parsed_rows[0].index(jj_observed_header)] == "S01, S02"
   assert parsed_rows[1][parsed_rows[0].index(jj_private_header)] == "S02"
+
+# =============================================================================
+# Phase lookup
+# =============================================================================
+
+BEFORE_FIRST_PHASE = date(1999, 12, 25)
+FIRST_PHASE_START = date(2000, 1, 1)
+FIRST_PHASE_WEIGHTS = {"MathQuest KA Textbook": 3}
+SECOND_PHASE_START = date(2000, 2, 1)
+SECOND_PHASE_WEIGHTS = {"MathQuest PKA Textbook": 4}
+
+PHASES = [
+  (FIRST_PHASE_START, FIRST_PHASE_WEIGHTS),
+  (SECOND_PHASE_START, SECOND_PHASE_WEIGHTS),
+]
+
+
+def test_find_phase_raises_ValueError_if_date_is_before_earliest_phase():
+
+  with pytest.raises(ValueError) as excinfo:
+    sg._find_phase(PHASES, BEFORE_FIRST_PHASE)
+
+  assert repr(BEFORE_FIRST_PHASE) in str(excinfo.value)
+  assert repr(FIRST_PHASE_START) in str(excinfo.value)
+
+
+def test_find_phase_returns_first_phase_weights_on_its_start_date():
+
+  assert sg._find_phase(PHASES, FIRST_PHASE_START) == FIRST_PHASE_WEIGHTS
+  assert sg._find_phase(PHASES, SECOND_PHASE_START) == SECOND_PHASE_WEIGHTS
