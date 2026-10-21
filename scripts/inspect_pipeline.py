@@ -372,7 +372,8 @@ def main():
 
   print("\nNotes:")
   for row in rows[-3:]:
-    print(row)
+    print(row["student_id"])
+    print(row["Notes"])
 
   # =============================================================================
   # Synthesis enrichment
