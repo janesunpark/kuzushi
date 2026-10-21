@@ -34,7 +34,7 @@ THEME_PHRASES = {
     "cross_learner": "both learners brought their own structure to multi-step tasks, though how each broke the steps down differed",
   },
   "spatial_pattern": {
-    "individual": "{student} correctly extended the geometric pattern",
+    "individual": "{student} correctly extended the spatial pattern in geometric shapes",
     "cross_learner": "both learners grasped the underlying spatial patterns in geometric puzzles by actively manipulating the shapes to complete tasks",
   },
 }
