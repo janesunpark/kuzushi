@@ -815,3 +815,41 @@ def test_find_phase_returns_first_phase_weights_on_its_start_date():
 
   assert sg._find_phase(PHASES, FIRST_PHASE_START) == FIRST_PHASE_WEIGHTS
   assert sg._find_phase(PHASES, SECOND_PHASE_START) == SECOND_PHASE_WEIGHTS
+
+# =============================================================================
+# Phrase bank guardrail
+# =============================================================================
+
+THEME_KEYWORDS = {
+  "familiar": "familiar",
+  "flexib": "flexib",
+  "independen": "independen",
+  "engag": "engag",
+  "motivat": "motivat",
+  "structure": "structure",
+  "spatial_pattern": "spatial",
+  "reward": "reward",
+  "scaffold": "scaffold",
+}
+
+DATA_FLAG_FIRST_WORDS = {"Observe", "Continue", "Track"}
+
+@pytest.mark.parametrize("bank_name, bank", [
+  ("THEME_PHRASES", sg.THEME_PHRASES),
+  ("LEARNING_MECHANISM_PHRASES", sg.LEARNING_MECHANISM_PHRASES),
+  ("DATA_FLAG_PHRASES", sg.DATA_FLAG_PHRASES),
+])
+def test_phrases_contain_their_theme_keywords(bank_name, bank):
+  assert [
+    f"{theme}/{variant}" for theme, variants in bank.items()
+    for variant, phrase in variants.items()
+    if THEME_KEYWORDS[theme] not in phrase
+  ] == []
+
+
+def test_data_flag_phrases_start_with_an_allowed_word():
+  assert [
+    f"{theme}/{variant}" for theme, variants in sg.DATA_FLAG_PHRASES.items()
+    for variant, phrase in variants.items()
+    if phrase.split()[0] not in DATA_FLAG_FIRST_WORDS
+  ] == []
