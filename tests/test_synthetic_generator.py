@@ -612,6 +612,53 @@ def test_assign_narrative_fields_returns_both_learners_individual_notable_shifts
   assert bullets[0].startswith("* S01") 
   assert bullets[1].startswith("* S02")
 
+
+NARRATIVE_FIELDS = [
+  "Snapshot",
+  "Notable Shifts or Confirmations",
+  "Learning Mechanisms Observed",
+  "Optional: Data Flags (If Relevant)",
+]
+
+
+def test_assign_narrative_fields_gives_every_row_all_four_fields_as_strings():
+  rng = sg._generate_rng(42)
+  
+  synthesis_rows = [
+    {"week_ending": date(1999, 12, 25)},
+    {"week_ending": date(2000, 1, 1)},
+  ]
+  
+  weekly_counts = {
+    date(1999, 12, 25): {
+      "S01": Counter({"engag": 2}), 
+      "S02": Counter({"engag": 1, "familiar": 2})
+    },
+    date(2000, 1, 1): {
+      "S01": Counter({"comparison": 1}),
+      "S02": Counter()
+    }
+  }
+
+  result = sg.assign_narrative_fields(
+    synthesis_rows=synthesis_rows,
+    weekly_counts=weekly_counts,
+    weekly_jj_themes={},
+    rng=rng
+  )
+
+  assert [
+    f"{row["week_ending"]}/{field}" for row in result
+    for field in NARRATIVE_FIELDS
+    if not isinstance(row.get(field), str)
+  ] == []
+  
+  assert [
+    f"{row["week_ending"]}/{field}" for row in result
+    for field in NARRATIVE_FIELDS
+    if result[1].get(field) != ""
+  ] == []
+
 # =============================================================================
 # Weekly timestamp assignment
 # =============================================================================
@@ -855,7 +902,7 @@ def test_data_flag_phrases_start_with_an_allowed_word():
   ] == []
 
 # =============================================================================
-# Bullet builder contracts
+# Narrative builder contracts
 # =============================================================================
 
 def test_first_known_theme_uses_the_bank_it_is_given():
@@ -896,50 +943,3 @@ def test_build_shift_bullet_returns_the_bare_text_with_no_prefix():
   )
 
   assert result.startswith("S01")
-
-
-NARRATIVE_FIELDS = [
-  "Snapshot",
-  "Notable Shifts or Confirmations",
-  "Learning Mechanisms Observed",
-  "Optional: Data Flags (If Relevant)",
-]
-
-
-def test_assign_narrative_fields_gives_every_row_all_four_fields_as_strings():
-  rng = sg._generate_rng(42)
-  
-  synthesis_rows = [
-    {"week_ending": date(1999, 12, 25)},
-    {"week_ending": date(2000, 1, 1)},
-  ]
-  
-  weekly_counts = {
-    date(1999, 12, 25): {
-      "S01": Counter({"engag": 2}), 
-      "S02": Counter({"engag": 1, "familiar": 2})
-    },
-    date(2000, 1, 1): {
-      "S01": Counter({"comparison": 1}),
-      "S02": Counter()
-    }
-  }
-
-  result = sg.assign_narrative_fields(
-    synthesis_rows=synthesis_rows,
-    weekly_counts=weekly_counts,
-    weekly_jj_themes={},
-    rng=rng
-  )
-
-  assert [
-    f"{row["week_ending"]}/{field}" for row in result
-    for field in NARRATIVE_FIELDS
-    if not isinstance(row.get(field), str)
-  ] == []
-  
-  assert [
-    f"{row["week_ending"]}/{field}" for row in result
-    for field in NARRATIVE_FIELDS
-    if result[1].get(field) != ""
-  ] == []
