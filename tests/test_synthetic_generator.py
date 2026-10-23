@@ -853,3 +853,93 @@ def test_data_flag_phrases_start_with_an_allowed_word():
     for variant, phrase in variants.items()
     if phrase.split()[0] not in DATA_FLAG_FIRST_WORDS
   ] == []
+
+# =============================================================================
+# Bullet builder contracts
+# =============================================================================
+
+def test_first_known_theme_uses_the_bank_it_is_given():
+  theme_bucket = [("alpha", 2, False), ("beta", 1, False)]
+  bank_b = {"beta": {}}
+  bank_a = {"alpha": {}}
+
+  assert sg._first_known_theme(theme_bucket, bank_b) == theme_bucket[1]
+  assert sg._first_known_theme(theme_bucket, bank_a) == theme_bucket[0]
+
+
+@pytest.mark.parametrize("builder", [
+  sg._build_learning_mechanism,
+  sg._build_data_flags,
+])
+def test_bullet_builder_returns_empty_string_when_every_bucket_is_empty(builder):
+  selection = {
+    "all_themes": {
+      "cross_learner": [],
+      "S01_individual": [],
+      "S02_individual": [],
+    },
+    "top_themes": {}
+  }
+
+  assert builder(selection) == ""
+
+
+def test_build_shift_bullet_returns_the_bare_text_with_no_prefix():
+  result = sg._build_shift_bullet(
+    rng=sg._generate_rng(42),
+    theme="engag",
+    score=2,
+    has_jj=False,
+    bucket_type="individual",
+    week_top_score=2,
+    student="S01",
+  )
+
+  assert result.startswith("S01")
+
+
+NARRATIVE_FIELDS = [
+  "Snapshot",
+  "Notable Shifts or Confirmations",
+  "Learning Mechanisms Observed",
+  "Optional: Data Flags (If Relevant)",
+]
+
+
+def test_assign_narrative_fields_gives_every_row_all_four_fields_as_strings():
+  rng = sg._generate_rng(42)
+  
+  synthesis_rows = [
+    {"week_ending": date(1999, 12, 25)},
+    {"week_ending": date(2000, 1, 1)},
+  ]
+  
+  weekly_counts = {
+    date(1999, 12, 25): {
+      "S01": Counter({"engag": 2}), 
+      "S02": Counter({"engag": 1, "familiar": 2})
+    },
+    date(2000, 1, 1): {
+      "S01": Counter({"comparison": 1}),
+      "S02": Counter()
+    }
+  }
+
+  result = sg.assign_narrative_fields(
+    synthesis_rows=synthesis_rows,
+    weekly_counts=weekly_counts,
+    weekly_jj_themes={},
+    rng=rng
+  )
+
+  assert [
+    f"{row["week_ending"]}/{field}" for row in result
+    for field in NARRATIVE_FIELDS
+    if not isinstance(row.get(field), str)
+  ] == []
+  
+  assert [
+    f"{row["week_ending"]}/{field}" for row in result
+    for field in NARRATIVE_FIELDS
+    if result[1].get(field) != ""
+  ] == []
