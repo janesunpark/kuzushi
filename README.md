@@ -42,13 +42,17 @@ Kuzushi is based on structured observation logs from regular academic enrichment
 
 Raw session logs, names, exact dates, locations, videos, photos, and sensitive personal details remain private. This repository is intended to document exploratory observational patterns, not to evaluate, diagnose, or rank individual learners. 
 
+What this repository publishes, and what it does not, is stated in [What This Repository Publishes](docs/data_ethics.md#what-this-repository-publishes).
+
 Detailed privacy and anonymization practices are described in [Data Ethics & Anonymization](docs/data_ethics.md).
 
 ## Current Status
 
-This repository is in an active development phase. It currently contains project framing, research methodology, observation documentation, and the initial implementation of a medallion-layer pipeline for a reproducible data management. 
+This repository is in active development. It contains the project framing, research methodology, observation documentation, and the first stages of a medallion-architecture data pipeline.
 
-The 2025–2026 academic year observation cycle has been completed privately. The current development focuses on transforming those observational records into structured analytical datasets while preserving the original source data. Future work includes completing the Silver and Gold layers of the pipeline, generating synthetic or anonymized datasets for demonstration, and developing exploratory analyses and visualizations to investigate longitudinal learning patterns.
+The 2025–2026 observation cycle has been completed privately. A second cycle, covering the 2026–2027 school year, is now underway on a redesigned observation form that divides each session into sections, so that a skipped rating can be told apart from a behavior that simply did not occur.
+
+Because the raw observation logs remain private, the public pipeline runs on a synthetic dataset generated to mirror the structure of the real logs, with invented values. The Bronze layer, the synthetic data generator, and a pytest suite are in place; current work moves to a structural comparison of the synthetic and real data, followed by the Silver and Gold layers. Engineering decisions are recorded in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md).
 
 ## Emerging Themes
 
@@ -85,12 +89,13 @@ kuzushi/
 
 The next phase of Kuzushi will focus on strengthening the project's data and methodological foundation in preparation for future structured analysis. Planned next steps include:
 
-* building the foundational data pipeline for ingesting and preserving source data
-* developing the derived anonymized data schema and future codebook
-* creating sample anonymized or synthetic data structures 
-* building initial exploratory notebooks to visualize trends over time
-* developing a public-facing Notion or portfolio page to organize project materials
-* continuing to document possible cross-context problem-solving patterns with caution 
+* comparing the synthetic data's structure against the real logs, privately, before building further on it
+* building the Silver layer: cleaning, typing, and reconciling the 2025–2026 logs with the redesigned 2026–2027 form
+* building the Gold layer: a small number of exploratory visualizations and a written analysis, on synthetic data
+* developing the derived anonymized data schema and codebook
+* continuing the 2026–2027 observation cycle
+* documenting progress in a public Notion build log
+* continuing to document possible cross-context problem-solving patterns with caution
 
 ## Technical Stack
 
