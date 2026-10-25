@@ -52,6 +52,14 @@ Future technical work may involve derived, anonymized data structures based on p
 
 Raw observation logs and sensitive private data will not be published.
 
+## What This Repository Publishes
+
+Kuzushi publishes two things: what the pipeline does, demonstrated on synthetic data, and what the observer noticed, described in words as patterns. It does not publish the measurement record: no real per-learner ratings, counts, or dates, whether in data, figures, or source code.
+
+The synthetic data generator keeps the shape of each learner's data (which ratings are common and which are rare, and how the two learners differ) but not the real counts. Figures made from synthetic data show that the pipeline recovers patterns the generator was built to contain; they are not findings about the learners.
+
+Two kinds of real facts are kept on purpose. Counts that describe how much work the project involved, such as the number of sessions and weekly notes, stay close to the real ones, because changing them would misstate the project's scope. The weeks in which the observation form itself changed are published at week level, because they describe the instrument, not a learner.
+
 ## Responsible Use
 
 This repository is shared for documentation, portfolio, and academic review purposes only. The materials should not be reused, redistributed, or adapted as child-level assessment tools without permission.
