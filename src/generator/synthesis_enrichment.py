@@ -39,16 +39,14 @@ def assign_jj_synthesis_fields(
     new_row["Private Lessons"] = None
 
     if new_row["week_ending"] >= cutoff_week:
-      new_row["Private Lessons"] = rng.choice(
-        ["S02", None],
-        p=[0.8, 0.2],
-      )
+      options = ["S02", None]
+      index = rng.choice(len(options), p=[0.8, 0.2])
+      new_row["Private Lessons"] = options[index]
 
-      if new_row["Private Lessons"] != None:
-        new_row["JJ Observed"] = rng.choice(
-          [None, "S01, S02", "S02"],
-          p=[0.6, 0.25, 0.15],
-        )
+      if new_row["Private Lessons"] is not None:
+        options = [None, "S01, S02", "S02"]
+        index = rng.choice(len(options), p=[0.6, 0.25, 0.15])
+        new_row["JJ Observed"] = options[index]
 
     finalized_rows.append(new_row)
 
