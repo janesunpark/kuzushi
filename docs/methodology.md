@@ -8,7 +8,7 @@ The methodology centers on a multi-layered synthesis process. Private observatio
 
 ## Observation Context
 
-Kuzushi is based primarily on small-group academic enrichment sessions involving early math, spatial puzzles, strategic games, worksheet tasks, play-based exploration, and co-regulated learning. Periodic observations from youth Jiu Jitsu contexts serve as a secondary exploratory thread when relevant to problem-solving, strategy selection, regulation, or adaptation under constraint. 
+Kuzushi is based primarily on small-group academic enrichment sessions involving early math, spatial puzzles, worksheet tasks, occasional strategic games, play-based exploration, and co-regulated learning. Periodic observations from youth Jiu Jitsu contexts serve as a secondary exploratory thread when relevant to problem-solving, strategy selection, regulation, or adaptation under constraint. 
 
 The observation context is naturalistic. Sessions are shaped by learner readiness, task difficulty, motivation, regulation needs, instructional supports, and the relationship dynamics of repeated learning interactions. Because the project follows a small number of learners over time, the methodology emphasizes pattern tracking, cautious interpretation, and longitudinal synthesis rather than generalization. 
 

@@ -20,7 +20,7 @@ The project's motivation is to document these learning behaviors carefully over 
 
 ## Project Context
 
-Kuzushi is based on a longitudinal case study of young learners observed in small-group academic enrichment settings during the 2025–2026 school year. Sessions primarily focused on early math, spatial reasoning, strategic games, problem-solving tasks, and co-regulated learning interactions. 
+Kuzushi is based on a longitudinal case study of young learners observed in small-group academic enrichment settings during the 2025–2026 school year. Sessions primarily focused on early math, spatial reasoning, problem-solving tasks, and co-regulated learning interactions.
 
 The project follows a small number of learners over time rather than attempting to generalize across a large sample. This allows for detailed observation of learning behaviors such as task persistence, frustration recovery, strategy selection, motivation, comparison dynamics, and responses to scaffolding. 
 
