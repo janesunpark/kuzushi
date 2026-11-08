@@ -17,6 +17,7 @@ __pycache__/
 # Private observational data
 data/raw
 data/bronze
+data/synthetic
 
 # Internal project artifacts
 internal/
