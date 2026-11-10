@@ -50,8 +50,8 @@ def load_bronze(raw_dir: str | Path, bronze_dir: str | Path) -> dict[str, pd.Dat
  
   bronze_dict: dict[str, pd.DataFrame] = {}
   DATASETS = {
-    "session_observations": "session_observation_log_2025–2026.csv",
-    "weekly_syntheses": "weekly_synthesis_log_2025–2026.csv",
+    "session_observations": "session_observation_log_2025-2026.csv",
+    "weekly_syntheses": "weekly_synthesis_log_2025-2026.csv",
   }
 
   for dataset_name, filename in DATASETS.items(): 
