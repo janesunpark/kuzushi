@@ -933,3 +933,39 @@ Option 2. `generate_synthetic_logs(seed)` in `src/generator/pipeline.py` runs th
   - When the dates were consolidated into one constant per form revision, the steps that changed with the first revision were given the second revision's constant, which left their fields blank between the two. The test checks those fields inside that window, with the window's dates written as literals rather than imported from the pipeline: a test reading the same constant would agree with the code whatever the date was. It also asserts that the window matched at least one row, so it cannot pass by checking nothing.
 - A matching row count proved nothing. Three of the four bugs left the expected row counts unchanged, and the fourth crashed on some seeds and ran quietly on others. The tests that check how the pieces fit together are what caught them.
 - The integration tests call only the assembled function. A test that imported the individual steps and called them itself would build its own correctly wired pipeline and pass whether or not the real one was right. Each step's own behavior is already covered by the existing unit tests.
+
+## Milestone 36 — Comparing real and synthetic files without printing real data
+
+*Internal cross-reference: `raw_vs_synthetic_check.md` (internal planning doc), step 2; roadmap item 10b. Related: Milestones 1, 31, 33 and 34; blueprint Entry 43. See also Patterns Journal, "Correct by coincidence."*
+
+**Problem**
+
+The synthetic CSVs stand in for the real form exports, so that Silver and Gold can be built and tested in public. If the two differed in format, Silver's parsing could pass every test on synthetic data and then break on real data. The real files cannot be published or uploaded anywhere new, so the comparison had to run on the owner's machine and print nothing but summaries.
+
+**Options considered**
+
+1. Import both files into a spreadsheet and compare them by eye.
+2. A script that reads both files as raw text and prints only summaries: header text, and each column's value formats with the digits masked.
+
+**Chosen solution**
+
+Option 2. `scripts/compare_csv_format.py` uses only the standard library. It compares the session pair and the weekly pair column by column, by position rather than by name, because the session header has one name twice. It masks every digit as `D`, so a timestamp shows its shape without its value; skips the free-text columns; prints only the formats that appear in one file but not the other; and counts the columns that match. Real session rows are filtered to the two learners first, so both sides cover the same population.
+
+What it found, and what was decided:
+
+- **Headers:** identical in both pairs, including the repeated header, the ghost columns and the trailing space in `Week of `. The CSV writer's job (Milestone 31) holds against the real files.
+- **Dates and timestamps:** the real export writes them without leading zeros on month, day and hour; the synthetic files wrote ISO format. Bronze keeps both as text, so Silver would have needed a parsing path that only fake data uses. Decided: the writer formats dates when it writes each cell, and values stay real dates before that. This reopens generator code after the hard stop, so it is its own roadmap item (10b) with its own box.
+- **A rare session type the generator doesn't produce.** The real data records a 1-on-1 session type a handful of times; the generator never creates it. It stays unmodeled, since it is rare and not worth reopening the generator for. But Silver will meet it in the real data, so Silver's tests get one hand-written row with that session type.
+- **A hand-entered `NA`** in one rating column, added after the fact for sessions with no rating; it means the same as a blank. No generator change. Bronze's reader turns the text `NA` into a missing value by default, which is right here only by coincidence; whether Bronze should keep such text exactly is decided at the start of Silver.
+- **Materials and puzzle names** differ almost entirely. That is intended: both vocabularies were fictionalized (blueprint Entry 43). The structure matches, with multiple selections separated the same way. Silver must take its vocabularies from the data, not from a hard-coded list of real names.
+- **Not run:** the byte-level check. A byte-order mark would have shown up in the first header, and none did; line endings and quoting are removed by CSV parsing before Bronze stores anything. The check of empty cells by form version was cut for time.
+
+**Trade-offs**
+
+- A spreadsheet is quicker to look at, but it converts timestamps and numbers on import and displays its own rendering, which hides exactly the differences that matter, and it would mean uploading the real file somewhere new. Reading the raw text takes more code but sees what Bronze sees.
+- Not every difference matters. Parsing a CSV means reading its text into rows and cells, and some differences disappear in that step: the invisible characters that end each line, and whether a cell is wrapped in quotes. Those can never reach Silver. Others are in the values themselves, which Bronze keeps as text exactly: date formats, spellings, `NA` versus a blank. Those Silver has to handle. The byte-level check looked only for the first kind, which is why skipping most of it lost little.
+- Masking digits shows shapes without values, but it also hides some differences: two IDs with the same number of digits look the same, and value ranges disappear. A skip list for the free-text columns and a cap on how many formats print keep sentences out of the output.
+- Comparing exact sets of formats overstates the differences when one file simply never produces a format, for example if no synthetic session starts before 10:00. For the writer fix, the right test is whether every synthetic format also occurs in the real file: a subset, not an exact match.
+- A privacy guard failed open. The filter meant to keep the two learners' rows dropped the header, so a real session's values became the "column names"; the free-text skip list, which matched by name, stopped matching, and one real session's notes printed to the local terminal. Nothing was committed or published. The value comparison now runs only if the two headers are identical, so a broken assumption stops the script instead of printing data.
+- The real files were renamed to plain ASCII: an en dash in the year range became a hyphen. Bronze records the source filename in every row, so snapshots made before and after the rename record different names; nothing downstream should key on it.
+- Scope: the item ran two days past its once-extended time-box to finish this step. The printed side-by-side read moved to just before Gold, where the themes for the public figures get chosen.
