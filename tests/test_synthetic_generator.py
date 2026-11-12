@@ -833,6 +833,92 @@ def test_write_synthesis_csv_writes_each_value_under_its_own_header(tmp_path):
   assert parsed_rows[1][parsed_rows[0].index(jj_observed_header)] == "S01, S02"
   assert parsed_rows[1][parsed_rows[0].index(jj_private_header)] == "S02"
 
+
+@pytest.mark.parametrize("ts, expected", [
+  [datetime(1999, 12, 31, 13, 0, 0), "12/31/1999 13:00:00"],
+  [datetime(1999, 1, 7, 8, 5, 3), "1/7/1999 8:05:03"],
+  [datetime(1999, 1, 1, 0, 0, 0), "1/1/1999 0:00:00"],
+])
+def test_if_format_datetime_makes_correct_timestamp_str(ts, expected):
+  assert sg._format_datetime(ts) == expected
+
+
+@pytest.mark.parametrize("d, expected", [
+  [date(1999, 2, 1), "2/1/1999"],
+  [date(1999, 12, 13), "12/13/1999"],
+])
+def test_if_format_date_makes_correct_week_of_str(d, expected):
+  assert sg._format_date(d) == expected
+
+
+@pytest.mark.parametrize("value, expected", [
+  ["S01", "S01"],
+  [None, None],
+  [3, 3],
+  [datetime(1999, 2, 1, 8, 5, 3), "2/1/1999 8:05:03"],
+  [date(1999, 2, 1), "2/1/1999"],
+])
+def test_format_cell_value_returns_expected_value(value, expected):
+  assert sg._format_cell_value(value) == expected
+
+
+def test_write_session_csv_formats_cells_and_leaves_row_unchanged(tmp_path):
+
+  row: dict[str, str | object] = {internal: "test_val" for internal, _ in sg.SESSION_COLUMNS}
+  row["timestamp"] = datetime(1999, 1, 7, 8, 5, 3)
+  row["Focus or Attention"] = 4
+  row["Resilience"] = None
+
+  original_row = deepcopy(row)
+
+  str_path = str(tmp_path/"test_data.csv")
+  sg.write_session_csv([row], str_path)
+
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_rows = list(reader)
+
+  timestamp_idx = parsed_rows[0].index("Timestamp")
+  focus_or_attention_idx = parsed_rows[0].index("Focus or Attention")
+  resilience_idx = parsed_rows[0].index("Resilience (Response to Mistakes or Corrections)")
+  notes_idx = parsed_rows[0].index("Notes")
+
+  assert parsed_rows[1][timestamp_idx] == "1/7/1999 8:05:03"
+  assert parsed_rows[1][focus_or_attention_idx] == "4"
+  assert parsed_rows[1][resilience_idx] == ""
+  assert parsed_rows[1][notes_idx] == "test_val"
+  assert row == original_row
+
+
+def test_write_synthesis_csv_formats_cells_and_leaves_row_unchanged(tmp_path):
+
+  row: dict[str, str | object] = {internal: "test_val" for internal, _ in sg.SYNTHESIS_COLUMNS}
+  row["timestamp"] = datetime(1999, 12, 31, 13, 0, 0)
+  row["week_ending"] = date(1999, 2, 1)
+  row["num_sessions_reported"] = 2
+  row["Column 10"] = None
+  
+  original_row = deepcopy(row)
+  
+  str_path = str(tmp_path/"test_data.csv")
+  sg.write_synthesis_csv([row], str_path)
+  
+  with open(str_path, mode="r", newline="", encoding="utf-8") as file:
+    reader = csv.reader(file)
+    parsed_rows = list(reader)
+  
+  timestamp_idx = parsed_rows[0].index("Timestamp")
+  week_of_idx = parsed_rows[0].index("Week of ")
+  num_sessions_idx = parsed_rows[0].index("Number of Enrichment Sessions")
+  column_10_idx = parsed_rows[0].index("Column 10")
+  
+  assert parsed_rows[1][timestamp_idx] == "12/31/1999 13:00:00"
+  assert parsed_rows[1][week_of_idx] == "2/1/1999"
+  assert parsed_rows[1][num_sessions_idx] == "2"
+  assert parsed_rows[1][column_10_idx] == ""
+  assert row == original_row
+
+  
 # =============================================================================
 # Phase lookup
 # =============================================================================

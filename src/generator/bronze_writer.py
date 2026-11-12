@@ -1,4 +1,5 @@
 import csv
+from datetime import date, datetime
 
 
 SESSION_COLUMNS = [
@@ -54,6 +55,34 @@ SYNTHESIS_COLUMNS = [
 ]
 
 
+def _format_datetime(dt: datetime) -> str:
+  month = dt.month
+  day = dt.day
+  year = dt.year
+  hour = dt.hour
+  minute = f"{dt.minute:02d}"
+  second = f"{dt.second:02d}"
+
+  return f"{month}/{day}/{year} {hour}:{minute}:{second}"
+
+
+def _format_date(d: date) -> str:
+  month = d.month
+  day = d.day
+  year = d.year
+
+  return f"{month}/{day}/{year}"
+
+
+def _format_cell_value(value):
+  if isinstance(value, datetime):
+    return _format_datetime(value)
+  elif isinstance(value, date):
+    return _format_date(value)
+  else:
+    return value
+
+
 def _write_csv(rows: list[dict], columns: list[tuple[str, str]], path: str) -> None:
   header_row = [real for _, real in columns]
   with open(path, "w", newline="") as f:
@@ -64,7 +93,8 @@ def _write_csv(rows: list[dict], columns: list[tuple[str, str]], path: str) -> N
       for internal, real in columns:
         if internal not in row:
           raise KeyError(f"Row is missing expected field {internal!r} (needed for header {real!r})")
-        value_row.append(row[internal])
+        updated_val = _format_cell_value(row[internal])
+        value_row.append(updated_val)
       writer.writerow(value_row)
 
 
