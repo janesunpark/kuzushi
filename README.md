@@ -52,7 +52,7 @@ This repository is in active development. It contains the project framing, resea
 
 The 2025–2026 observation cycle has been completed privately. A second cycle, covering the 2026–2027 school year, is now underway on a redesigned observation form that divides each session into sections, so that a skipped rating can be told apart from a behavior that simply did not occur.
 
-Because the raw observation logs remain private, the public pipeline runs on a synthetic dataset generated to mirror the structure of the real logs, with invented values. The Bronze layer, the synthetic data generator, and a pytest suite are in place; current work moves to a structural comparison of the synthetic and real data, followed by the Silver and Gold layers. Engineering decisions are recorded in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md).
+Because the raw observation logs remain private, the public pipeline runs on a synthetic dataset generated to mirror the structure of the real logs, with invented values. The Bronze layer, an end-to-end synthetic data generator, and a pytest suite are in place. The generator was checked privately against the real logs’ headers and value formats. Current work moves to the Silver layer, Gold after it. Engineering decisions are recorded in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md).
 
 Build log: [Kuzushi on Notion](https://suave-citipati-b84.notion.site/Kuzushi-Build-Log-405784db78c380c8a829fdfb7f21361a)
 
@@ -87,11 +87,38 @@ kuzushi/
 
 ```
 
+## Running It
+
+Everything below runs on the synthetic data; no private files are needed. Commands are for macOS or Linux, run from the repository's root folder. 
+
+**Setup.** Kuzushi uses Python 3.12. Newer Python versions may not have ready-made builds for every dependency yet. Create a virtual environment, activate it, and install the dependencies: 
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+```
+
+**Generate the synthetic logs.** This writes the session log and the weekly log as CSV files to `data/synthetic/`, in the same column layout as the real form exports, and prints how many rows each has:
+
+```bash
+python -m scripts.generate_synthetic_data
+```
+
+The seed is set at the top of the script (42 by default). The same seed always produces the same files; a different seed produces a different dataset with the same structure.
+
+**Run the tests.**
+
+```bash
+pytest
+```
+
+`scripts/compare_csv_format.py` compares the synthetic files with the private logs, so it runs only on the author's machine.
+
 ## Next Steps
 
 The next phase of Kuzushi will focus on strengthening the project's data and methodological foundation in preparation for future structured analysis. Planned next steps include:
 
-* comparing the synthetic data's structure against the real logs, privately, before building further on it
 * building the Silver layer: cleaning, typing, and reconciling the 2025–2026 logs with the redesigned 2026–2027 form
 * building the Gold layer: a small number of exploratory visualizations and a written analysis, on synthetic data
 * developing the derived anonymized data schema and codebook
