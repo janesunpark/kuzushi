@@ -15,9 +15,8 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Private observational data
-data/raw
-data/bronze
-data/synthetic
+data/*
+!data/README.md
 
 # Internal project artifacts
 internal/
