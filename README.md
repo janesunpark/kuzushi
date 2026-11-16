@@ -54,7 +54,7 @@ The 2025–2026 observation cycle has been completed privately. A second cycle, 
 
 Because the raw observation logs remain private, the public pipeline runs on a synthetic dataset generated to mirror the structure of the real logs, with invented values. The Bronze layer, an end-to-end synthetic data generator, and a pytest suite are in place. The generator was checked privately against the real logs’ headers and value formats. Current work moves to the Silver layer, Gold after it. Engineering decisions are recorded in [`ENGINEERING_LOG.md`](ENGINEERING_LOG.md).
 
-Build log: [Kuzushi on Notion](https://suave-citipati-b84.notion.site/Kuzushi-Build-Log-405784db78c380c8a829fdfb7f21361a)
+Build log: [Kuzushi on Notion](https://janesunpark.notion.site/Kuzushi-Build-Log-405784db78c380c8a829fdfb7f21361a)
 
 ## Emerging Themes
 
