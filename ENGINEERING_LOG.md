@@ -4,7 +4,7 @@ This log records the engineering decisions made while building Kuzushi's data pi
 
 For the research methodology and data ethics behind the underlying observations, see [`docs/methodology.md`](docs/methodology.md) and [`docs/data_ethics.md`](docs/data_ethics.md). This log covers the *engineering* side only: how data is generated, ingested, cleaned, and structured.
 
-**A note on how this document is written.** Consistent with the AI-assistance disclosure in `methodology.md`, portions of this log are drafted and organized with AI assistance based on decisions made, tested, and reviewed by the author. Every entry reflects a decision that was actually made and, where a verification claim is stated (e.g. "0 duplicates across 15 seeds"), actually run — the drafting tool did not originate the engineering judgment, only the write-up.
+**A note on how this document is written.** Consistent with the AI-assistance disclosure in methodology.md, this log is drafted with AI assistance and reviewed and approved by the author. Its decisions are the author’s. They came out of design discussions in which the AI asked questions, laid out options in unfamiliar territory, critiqued the author’s options and pointed out bugs, and the author chose. Every entry records a decision that was actually made, and every stated verification (e.g. “0 duplicates across 15 seeds”) was actually run, by the author or, for some checks, by the AI.
 
 ---
 
